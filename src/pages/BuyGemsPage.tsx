@@ -165,11 +165,11 @@ export default function BuyGemsPage() {
                )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
               {gemPackages.map((pack) => (
                 <div 
                   key={pack.id}
-                  className={`relative border-4 border-black p-6 flex flex-col transition-transform duration-300 ${pack.popular ? 'scale-105 z-10 shadow-[10px_10px_0px_#ccff00]' : 'hover:-translate-y-2 hover:shadow-[8px_8px_0px_#fffbf0]'}`}
+                  className={`relative border-4 border-black p-3 md:p-6 flex flex-col items-center justify-center aspect-square transition-transform duration-300 ${pack.popular ? 'md:scale-105 z-10 shadow-[6px_6px_0px_#ccff00] md:shadow-[10px_10px_0px_#ccff00]' : 'hover:-translate-y-2 hover:shadow-[4px_4px_0px_#fffbf0] md:hover:shadow-[8px_8px_0px_#fffbf0]'}`}
                   style={{ backgroundColor: pack.color }}
                 >
                   {pack.popular && (
@@ -178,22 +178,22 @@ export default function BuyGemsPage() {
                     </div>
                   )}
                   
-                  <div className="text-black mb-6 border-b-4 border-black/20 pb-4">
-                    <h3 className="font-black text-2xl uppercase mb-1">{lang === 'ar' ? pack.name : pack.nameEn}</h3>
-                    <p className="font-bold text-sm opacity-70 uppercase">{t("Instant Delivery", "تسليم فوري")}</p>
+                  <div className="text-black mb-2 md:mb-6 border-b-2 md:border-b-4 border-black/20 pb-2 md:pb-4 text-center w-full">
+                    <h3 className="font-black text-sm md:text-2xl uppercase mb-0.5 md:mb-1 truncate w-full">{lang === 'ar' ? pack.name : pack.nameEn}</h3>
+                    <p className="font-bold text-[8px] md:text-sm opacity-70 uppercase truncate">{t("Instant Delivery", "تسليم فوري")}</p>
                   </div>
                   
-                  <div className="flex-1 flex flex-col items-center justify-center py-6 text-black">
-                    <div className={`mb-4 ${pack.popular ? 'scale-150 animate-bounce' : 'scale-125'}`}>
-                      <GemIcon size={48} />
+                  <div className="flex-1 flex flex-col items-center justify-center py-2 md:py-6 text-black">
+                    <div className={`mb-2 md:mb-4 ${pack.popular ? 'scale-110 md:scale-150 md:animate-bounce' : 'scale-100 md:scale-125'}`}>
+                      <GemIcon size={32} className="md:w-12 md:h-12" />
                     </div>
-                    <div className="text-5xl font-black">{pack.gems} <span className="text-xl"></span></div>
+                    <div className="text-2xl md:text-5xl font-black">{pack.gems}</div>
                   </div>
                   
-                  <div className="mt-6 pt-4 border-t-4 border-black/20">
+                  <div className="mt-2 md:mt-6 pt-2 md:pt-4 border-t-2 md:border-t-4 border-black/20 w-full">
                     <button 
                       onClick={() => isLoggedIn ? setSelectedPack(pack) : openLogin()}
-                      className="w-full bg-black text-white font-black uppercase py-4 border-4 border-black hover:bg-white hover:text-black transition-colors shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none"
+                      className="w-full bg-black text-white font-black uppercase py-2 md:py-4 border-2 md:border-4 border-black hover:bg-white hover:text-black transition-all shadow-[2px_2px_0px_#000] md:shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none text-[13px] md:text-xl tracking-tight"
                     >
                       {formatPrice(pack.price, pack.gems)}
                     </button>

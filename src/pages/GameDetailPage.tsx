@@ -457,18 +457,14 @@ export default function GameDetailPage() {
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
             <div className="relative w-full max-w-md my-auto">
               <div className="absolute inset-0 bg-[var(--c-lime)] translate-x-3 translate-y-3 border-4 border-[var(--c-ink)]" />
-              <div className="relative border-4 border-[var(--c-ink)] p-3 pr-12 md:p-4 md:pr-16 flex flex-col max-h-[90vh]" style={{ backgroundColor: "var(--c-bg)" }}>
-                <button onClick={() => setModalOpen(false)} className="absolute top-3 right-3 md:top-4 md:right-4 w-8 h-8 border-2 border-[var(--c-ink)] flex items-center justify-center hover:bg-[var(--c-ink)] hover:text-[var(--c-bg)] transition-colors z-30 bg-white shadow-[2px_2px_0px_#000]">
-                  <X className="w-5 h-5" />
-                </button>
-                <div className="absolute top-16 bottom-4 right-2 md:right-3 w-8 md:w-10 flex flex-col gap-2 z-20">
-                  <button onClick={() => scrollCheckout(-100)} className="w-8 h-10 md:w-10 md:h-12 flex items-center justify-center bg-[var(--c-orange)] border-4 border-[var(--c-ink)] text-[var(--c-ink)] hover:bg-[var(--c-lime)] transition-colors shadow-[2px_2px_0px_#000]"> <ChevronUp className="w-5 h-5 md:w-6 md:h-6" /> </button>
-                  <div className="flex-1 border-x-4 border-[var(--c-ink)]/20 mx-auto w-1 my-1"></div>
-                  <button onClick={() => scrollCheckout(100)} className="w-8 h-10 md:w-10 md:h-12 flex items-center justify-center bg-[var(--c-orange)] border-4 border-[var(--c-ink)] text-[var(--c-ink)] hover:bg-[var(--c-lime)] transition-colors shadow-[2px_2px_0px_#000]"> <ChevronDown className="w-5 h-5 md:w-6 md:h-6" /> </button>
-                </div>
+            <div className="relative border-4 border-[var(--c-ink)] p-4 md:p-6 flex flex-col max-h-[90vh]" style={{ backgroundColor: "var(--c-bg)" }}>
 
-                <div className="shrink-0 mb-4 z-10 mr-2 md:mr-0">
-                  <div className="border-4 border-[var(--c-ink)] overflow-hidden shadow-[4px_4px_0px_var(--c-ink)]">
+
+                <div className="shrink-0 mb-4 z-10">
+                  <div className="relative border-4 border-[var(--c-ink)] overflow-hidden shadow-[4px_4px_0px_var(--c-ink)]">
+                    <button onClick={() => setModalOpen(false)} className={`absolute top-2 ${lang === 'ar' ? 'left-2' : 'right-2'} w-8 h-8 border-2 border-[var(--c-ink)] flex items-center justify-center hover:bg-[var(--c-ink)] hover:text-[var(--c-bg)] transition-colors z-30 bg-white shadow-[2px_2px_0px_#000]`}>
+                      <X className="w-4 h-4" />
+                    </button>
                     <div className={`${game.color} p-3 md:p-4`}>
                       <p className="text-[10px] md:text-xs font-bold uppercase opacity-70 mb-1">{game.name}</p>
                       <p className="text-xl md:text-2xl font-black leading-none truncate">{lang === 'ar' ? (selectedPkg.nameAr || selectedPkg.name) : selectedPkg.name}</p>
@@ -493,7 +489,7 @@ export default function GameDetailPage() {
                   </div>
                 </div>
 
-                <div ref={checkoutScrollRef} className="flex-1 overflow-y-auto pt-1 pb-8 text-[var(--c-ink)] relative mr-1 md:mr-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div ref={checkoutScrollRef} className="flex-1 overflow-y-auto pt-1 pb-8 text-[var(--c-ink)] relative [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                   {checkoutStep === 1 && (
                     <div className="animate-in fade-in slide-in-from-right duration-300">
                       <div className="border-4 border-[var(--c-ink)] p-4 mb-6 bg-[var(--c-lime)]/10">
@@ -530,7 +526,7 @@ export default function GameDetailPage() {
                           {[ 
                             { id: "gems", label: "Pay with Gems", ar: "ادفع بالجواهر", icon: <GemIcon size={16} /> },
                             ...settings.paymentAccounts
-                              .filter(acc => acc.countryCode === "eg")
+                              .filter(acc => acc.countryCode === "eg" && !acc.name.toLowerCase().includes("vodafone"))
                               .map(acc => ({ 
                                 id: acc.id, 
                                 label: acc.name, 
@@ -550,7 +546,7 @@ export default function GameDetailPage() {
                         <div className="mt-3 bg-[var(--c-orange)]/10 border-2 border-[var(--c-ink)] p-3 flex items-start gap-2 shadow-[2px_2px_0px_var(--c-ink)]">
                           <Info className="w-4 h-4 text-[var(--c-orange)] shrink-0 mt-0.5" />
                           <p className="text-[10px] font-black uppercase leading-tight text-[var(--c-ink)]">
-                            {t("Vodafone Cash is the current default. Change it from 'Other Method' if you want a different wallet or country.", "فودافون كاش هي المحفظة الحالية، قم بتغييرها من زر 'طريقة أخرى' إن كنت تريد محفظة أو دولة مختلفة.")}
+                            {t("InstaPay is the current default. Change it from 'Other Method' if you want a different wallet or country.", "إنستا باي هي الوسيلة الحالية، قم بتغييرها من زر 'طريقة أخرى' إن كنت تريد محفظة أو دولة مختلفة.")}
                           </p>
                         </div>
                       </div>

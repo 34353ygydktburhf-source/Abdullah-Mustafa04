@@ -29,7 +29,9 @@ export default function ProfilePage() {
   
   const { addNotification } = useNotifications();
   const [giftInput, setGiftInput] = useState("");
-  const [isActionsOpen, setIsActionsOpen] = useState(false);
+  const [isActionsModalOpen, setIsActionsModalOpen] = useState(false);
+  const [isWalletExpanded, setIsWalletExpanded] = useState(false);
+  const [giftError, setGiftError] = useState("");
   const { hasActiveStatus, openViewer } = useAdminStatus();
   
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -82,7 +84,7 @@ export default function ProfilePage() {
   const ActionButtons = () => (
     <>
       <button 
-        onClick={() => { setShowInfoModal(true); setIsActionsOpen(false); }}
+        onClick={() => { setShowInfoModal(true); setIsActionsModalOpen(false); }}
         className="flex items-center gap-2 bg-[#101010] text-white px-3 py-2 text-[10px] md:text-xs font-black uppercase hover:bg-[#ff5e00] hover:text-black transition-all border-2 border-black shadow-[2px_2px_0px_#000] active:translate-y-0.5 active:shadow-none w-full md:w-auto justify-center md:justify-start"
       >
         <Info className="w-4 h-4" />
@@ -90,28 +92,35 @@ export default function ProfilePage() {
       </button>
       {hasActiveStatus && (
         <button 
-          onClick={() => { openViewer(); setIsActionsOpen(false); }}
+          onClick={() => { openViewer(); setIsActionsModalOpen(false); }}
           className="bg-[#ccff00] text-black px-3 py-2 font-black uppercase text-[10px] md:text-xs flex items-center gap-2 border-2 border-black hover:bg-black hover:text-white transition-all shadow-[2px_2px_0px_#000] active:translate-y-0.5 active:shadow-none w-full md:w-auto justify-center md:justify-start"
         >
           <Video className="w-4 h-4" /> {t("Show Status", "عرض الحالة")}
         </button>
       )}
       <button 
-        onClick={() => { setShowSavedAccounts(true); setIsActionsOpen(false); }}
+        onClick={() => { setShowSavedAccounts(true); setIsActionsModalOpen(false); }}
         className="flex items-center gap-2 bg-[#ccff00] text-black px-3 py-2 text-[10px] md:text-xs font-black uppercase hover:bg-[#ff5e00] transition-all border-2 border-black shadow-[2px_2px_0px_#000] active:translate-y-0.5 active:shadow-none w-full md:w-auto justify-center md:justify-start"
       >
         <Star className="w-4 h-4" />
         {t("Manage Favorites", "إدارة محفوظاتي")}
       </button>
       <button 
-        onClick={() => { triggerTestNotif(); setIsActionsOpen(false); }}
+        onClick={() => { triggerTestNotif(); setIsActionsModalOpen(false); }}
         className="flex items-center gap-2 bg-white text-black px-3 py-2 text-[10px] md:text-xs font-black uppercase hover:bg-[var(--c-lime)] transition-all border-2 border-black shadow-[2px_2px_0px_#000] active:translate-y-0.5 active:shadow-none w-full md:w-auto justify-center md:justify-start"
       >
         <BellRing className="w-4 h-4" />
         {t("Test Notif", "تجربة إشعار")}
       </button>
       <button 
-        onClick={() => { openLogoutConfirm(); setIsActionsOpen(false); }}
+        onClick={() => { setShowComplaintModal(true); setIsActionsModalOpen(false); }}
+        className="flex items-center gap-2 bg-[#ff5e00] text-black px-3 py-2 text-[10px] md:text-xs font-black uppercase hover:bg-black hover:text-[#fffbf0] transition-all border-2 border-black shadow-[2px_2px_0px_#000] active:translate-y-0.5 active:shadow-none w-full md:w-auto justify-center md:justify-start"
+      >
+        <AlertTriangle className="w-4 h-4" />
+        {t("Submit Complaint", "إرسال بلاغ")}
+      </button>
+      <button 
+        onClick={() => { openLogoutConfirm(); setIsActionsModalOpen(false); }}
         className="flex items-center gap-2 bg-red-600 text-[#fffbf0] px-3 py-2 text-[10px] md:text-xs font-black uppercase hover:bg-black transition-all border-2 border-black shadow-[2px_2px_0px_#000] active:translate-y-0.5 active:shadow-none w-full md:w-auto justify-center md:justify-start"
       >
         <LogOut className="w-4 h-4" />
@@ -223,22 +232,15 @@ export default function ProfilePage() {
                     {/* Mobile Collapsible Button */}
                     <div className="md:hidden">
                       <button 
-                        onClick={() => setIsActionsOpen(!isActionsOpen)}
+                        onClick={() => setIsActionsModalOpen(true)}
                         className="w-full flex items-center justify-between bg-[#101010] text-[#ccff00] px-4 py-3 font-black uppercase text-sm border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-0.5 active:shadow-none transition-all"
                       >
                         <span className="flex items-center gap-2">
                           <ReceiptText className="w-5 h-5" />
-                          {t("Quick Actions", "إجراءات الحساب")}
+                          {t("Account Actions", "إجراءات الحساب")}
                         </span>
-                        <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isActionsOpen ? 'rotate-180' : ''}`} />
+                        <ChevronRight className={`w-5 h-5 ${lang === 'ar' ? 'rotate-180' : ''}`} />
                       </button>
-                      
-                      {/* Collapsible Content */}
-                      <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isActionsOpen ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-                        <div className="flex flex-col gap-3 pb-2">
-                          <ActionButtons />
-                        </div>
-                      </div>
                     </div>
 
                     {/* Desktop Side-by-Side */}
@@ -312,25 +314,44 @@ export default function ProfilePage() {
               </div>
 
               {/* Gem Wallet Hub */}
-              <div className="border-4 border-black bg-[#fffbf0] text-black shadow-[8px_8px_0px_#ccff00] p-6 md:p-8 animate-in fade-in-up duration-500 delay-100">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-6">
-                  <div>
+              <div className="border-4 border-black bg-[#fffbf0] text-black shadow-[8px_8px_0px_#ccff00] animate-in fade-in-up duration-500 delay-100 overflow-hidden">
+                <div 
+                  className="flex items-center justify-between p-6 md:p-8 cursor-pointer hover:bg-black/5 transition-colors select-none"
+                  onClick={() => setIsWalletExpanded(!isWalletExpanded)}
+                >
+                  <div className="flex items-center gap-4">
                     <h3 className="font-black uppercase text-2xl md:text-3xl flex items-center gap-3 text-[#b084ff]">
                       <GemIcon size={32} />
                       {t("Gem Wallet", "المحفظة الذهبية")}
                     </h3>
-                    <p className="text-sm font-bold opacity-70 mt-1 uppercase">
-                      {t("Your universal store currency", "عملتك الموحدة داخل المتجر")}
-                    </p>
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-1">{t("Current Balance", "الرصيد الحالي")}</span>
-                    <div className="text-4xl md:text-5xl font-black text-black bg-[#ccff00] px-4 py-2 border-4 border-black relative">
-                      {balance.toLocaleString()}
-                      <span className="absolute -top-3 -right-3 rotate-12 bg-black text-[#ccff00] text-xs font-black px-2 py-0.5 border-2 border-white">Gems</span>
+                  <div className="flex items-center gap-6">
+                    <div className="hidden md:flex flex-col items-end">
+                      <span className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-1">{t("Balance", "الرصيد")}</span>
+                      <div className="text-xl font-black text-black bg-[#ccff00] px-3 py-1 border-2 border-black">
+                        {balance.toLocaleString()}
+                      </div>
                     </div>
+                    <ChevronDown className={`w-8 h-8 transition-transform duration-300 ${isWalletExpanded ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
+
+                <div className={`overflow-hidden transition-all duration-500 ${isWalletExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <div className="p-6 md:p-8 pt-0 border-t-4 border-black/10">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-6 mt-6">
+                      <div className="flex-1">
+                        <p className="text-sm font-bold opacity-70 uppercase">
+                          {t("Your universal store currency", "عملتك الموحدة داخل المتجر")}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-1">{t("Current Balance", "الرصيد الحالي")}</span>
+                        <div className="text-4xl md:text-5xl font-black text-black bg-[#ccff00] px-4 py-2 border-4 border-black relative">
+                          {balance.toLocaleString()}
+                          <span className="absolute -top-3 -right-3 rotate-12 bg-black text-[#ccff00] text-xs font-black px-2 py-0.5 border-2 border-white">Gems</span>
+                        </div>
+                      </div>
+                    </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <div className="border-4 border-black bg-white p-5 cursor-pointer hover:-translate-y-1 transition-all group" onClick={() => addNotification(t("Adding...", "جار الإضافة"), t("Direct purchasing gems will be available via store packages...", "تتوفر خاصية الشراء المباشر عبر الباقات..."), "info")}>
@@ -356,10 +377,12 @@ export default function ProfilePage() {
                       />
                       <button 
                         onClick={() => {
+                          setGiftError("");
                           if (redeemGiftCode(giftInput)) {
                             setGiftInput("");
                             addNotification("Success", "تم استرداد الكود بنجاح", "success");
                           } else {
+                            setGiftError(t("Invalid or used code", "الكود غير صحيح أو مستخدم"));
                             addNotification("Error", "الكود غير صحيح أو مستخدم", "error");
                           }
                         }}
@@ -368,6 +391,11 @@ export default function ProfilePage() {
                         {t("Apply", "تطبيق")}
                       </button>
                     </div>
+                    {giftError && (
+                      <p className="text-[10px] font-black text-red-600 mt-2 uppercase animate-in fade-in slide-in-from-top-1">
+                        {giftError}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -389,6 +417,8 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
+                  </div>
+                </div>
               </div>
 
               {/* Level Progress */}
@@ -415,7 +445,7 @@ export default function ProfilePage() {
 
               {/* Complaints & Support Button */}
               <div 
-                className="border-4 border-[#fffbf0] p-5 bg-[#ff5e00] text-black shadow-[4px_4px_0px_#fffbf0] md:shadow-[8px_8px_0px_#b084ff] flex items-center justify-between group cursor-pointer hover:-translate-y-1 transition-all" 
+                className="hidden md:flex border-4 border-[#fffbf0] p-5 bg-[#ff5e00] text-black shadow-[4px_4px_0px_#fffbf0] md:shadow-[8px_8px_0px_#b084ff] items-center justify-between group cursor-pointer hover:-translate-y-1 transition-all" 
                 onClick={() => setShowComplaintModal(true)}
               >
                 <div className="flex items-center gap-3">
@@ -572,6 +602,35 @@ export default function ProfilePage() {
         isOpen={showComplaintModal} 
         onClose={() => setShowComplaintModal(false)} 
       />
+
+      {isActionsModalOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+           <div className="absolute inset-0" onClick={() => setIsActionsModalOpen(false)} />
+           <div className="relative bg-[#fffbf0] border-8 border-black p-6 shadow-[15px_15px_0px_#ccff00] w-full max-w-sm">
+              <button 
+                onClick={() => setIsActionsModalOpen(false)}
+                className="absolute -top-6 -right-6 w-12 h-12 bg-white border-4 border-black flex items-center justify-center shadow-[4px_4px_0px_#000] hover:bg-black hover:text-white transition-all z-20"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              
+              <div className="mb-6 flex items-center gap-3">
+                 <div className="bg-[#b084ff] p-2 border-2 border-black rotate-3">
+                    <ReceiptText className="w-6 h-6 text-black" />
+                 </div>
+                 <h3 className="text-2xl font-black uppercase text-black">{t("Account Actions", "إجراءات الحساب")}</h3>
+              </div>
+              
+              <div className="flex flex-col gap-4">
+                 <ActionButtons />
+              </div>
+              
+              <div className="mt-8 pt-6 border-t-4 border-black/10">
+                 <p className="text-[10px] font-black uppercase opacity-40 text-center">{t("AL LORD STORE SYSTEM ACCESS", "ال لورد ستور - نظام الوصول")}</p>
+              </div>
+           </div>
+        </div>
+      )}
     </div>
     </>
   );

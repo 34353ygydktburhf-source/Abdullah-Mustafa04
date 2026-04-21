@@ -20,7 +20,7 @@ export function CommunityAds() {
   const { settings } = useSettings();
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [copied, setCopied] = useState(false);
-  const [isAdsCollapsed, setIsAdsCollapsed] = useState(false);
+  const [isAdsCollapsed, setIsAdsCollapsed] = useState(true);
 
   const ADS_DATA: Ad[] = [
     {

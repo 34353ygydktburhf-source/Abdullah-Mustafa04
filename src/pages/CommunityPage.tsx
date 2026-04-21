@@ -143,18 +143,50 @@ export default function CommunityPage() {
         <Navbar />
 
         {/* Hero Section */}
-        <section className="pt-24 md:pt-32 pb-12 px-4 md:px-8 bg-black border-b-8 border-[var(--c-ink)] relative">
+        <section className="pt-20 md:pt-24 pb-8 px-4 md:px-8 bg-black border-b-8 border-[var(--c-ink)] relative overflow-hidden">
+          {/* Decorative Grid & Image */}
           <div className="absolute inset-0 opacity-20 bg-[url('https://i.pinimg.com/736x/fa/79/0d/fa790deb7789e9bf7236d5777cc90618.jpg')] bg-cover bg-center mix-blend-luminosity"></div>
-          <div className="max-w-6xl mx-auto relative z-10 text-center flex flex-col items-center">
-            <div className="bg-[var(--c-lime)] p-4 border-4 border-black inline-flex mb-6 rotate-3 shadow-[4px_4px_0px_#000]">
-              <Users className="w-12 h-12 text-black" />
+          <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,transparent_0%,black_70%)]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[repeating-linear-gradient(0deg,transparent,transparent_1px,white_1px,white_2px),repeating-linear-gradient(90deg,transparent,transparent_1px,white_1px,white_2px)] [background-size:20px_20px]" />
+          
+          <div className="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex flex-col items-center md:items-start text-center md:text-right flex-1 order-2 md:order-1">
+              <div className="relative mb-4 group inline-block">
+                <div className="absolute inset-0 bg-[#fffbf0] translate-x-1.5 translate-y-1.5 border-4 border-black group-hover:translate-x-0 group-hover:translate-y-0 transition-transform"></div>
+                <div className="relative bg-[var(--c-lime)] border-4 border-black px-6 py-3 shadow-[8px_8px_0px_rgba(0,0,0,0.2)]">
+                  <h1 className="text-4xl md:text-6xl font-black text-black tracking-tighter leading-none">
+                    {t("AL LORD COMMUNITY", "مجتمع ال لورد")}
+                  </h1>
+                </div>
+                <div className="absolute -top-3 -left-3 bg-black text-[var(--c-lime)] px-2 py-1 text-[10px] font-black uppercase border-2 border-[var(--c-lime)] rotate-[-4deg]">
+                  {t("OFFICIAL", "رسمي")}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 mb-6">
+                 <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_red]"></div>
+                 <p className="text-[10px] md:text-xs text-white/60 font-black uppercase tracking-[0.2em]">
+                   {t("SECURE ACCESS • PRIVATE ZONE", "دخول آمن • منطقة خاصة")}
+                 </p>
+              </div>
+              
+              <div className="relative group max-w-sm">
+                <div className="absolute inset-0 bg-white/10 translate-x-1 translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform"></div>
+                <div className="relative border-2 border-white/20 bg-black/40 backdrop-blur-md px-4 py-2 text-[10px] md:text-xs font-bold text-white/80 leading-snug">
+                  <span className="text-[var(--c-orange)] mr-1">⚠️</span> {t("Safe exchange platform. No links or numbers allowed.", "منصة التبادل الآمنة. يمنع نشر الروابط أو الأرقام.")}
+                </div>
+              </div>
             </div>
-            <h1 className="text-5xl md:text-8xl font-black text-white text-outline tracking-tighter mb-4">
-              {t("SECRET COMMUNITY", "المجتمع السري")}
-            </h1>
-            <p className="text-lg md:text-2xl text-[var(--c-lime)] font-bold max-w-2xl mx-auto border-4 border-black bg-black p-2 leading-snug">
-              {t("Safe exchange platform. No links or numbers allowed for your protection.", "منصة التبادل الآمنة. ممنوع نشر الروابط أو الأرقام لحمايتكم.")}
-            </p>
+
+            <div className="relative order-1 md:order-2 shrink-0">
+               <div className="absolute inset-0 bg-[var(--c-lime)] rotate-6 border-4 border-black"></div>
+               <div className="relative bg-white p-4 md:p-6 border-4 border-black shadow-[8px_8px_0px_#000] animate-in zoom-in-90 duration-500">
+                  <Users className="w-12 h-12 md:w-16 md:h-16 text-black" />
+               </div>
+               <div className="absolute -top-3 -right-3 bg-red-600 text-white px-2 py-0.5 text-[10px] font-black uppercase border-2 border-black -rotate-12">
+                  Live
+               </div>
+            </div>
           </div>
         </section>
 

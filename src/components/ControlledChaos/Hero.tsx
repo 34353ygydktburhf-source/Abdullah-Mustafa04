@@ -51,35 +51,34 @@ export function Hero() {
 
       <div className="noise" />
 
-      <div className="parallax-layer absolute top-20 left-10">
-        <div className="w-24 h-24 bg-[var(--c-lime)] rounded-full flex items-center justify-center rotate-12 border-4 border-[var(--c-ink)]">
-          <Gamepad2 className="w-12 h-12" />
+      <div className="parallax-layer absolute top-32 md:top-20 left-4 md:left-10 opacity-40 md:opacity-100">
+        <div className="w-16 h-16 md:w-24 md:h-24 bg-[var(--c-lime)] rounded-full flex items-center justify-center rotate-12 border-4 border-[var(--c-ink)] shadow-[4px_4px_0px_var(--c-ink)]">
+          <Gamepad2 className="w-8 h-8 md:w-12 md:h-12" />
         </div>
       </div>
 
-      <div className="parallax-layer-rev absolute bottom-20 right-10">
-        <div className="w-32 h-32 border-4 border-[var(--c-ink)] rounded-full flex items-center justify-center">
-          <Zap className="w-12 h-12 fill-[var(--c-orange)] text-[var(--c-orange)]" />
+      <div className="parallax-layer-rev absolute bottom-32 md:bottom-20 right-4 md:right-10 opacity-40 md:opacity-100">
+        <div className="w-24 h-24 md:w-32 md:h-32 border-4 border-[var(--c-ink)] rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm shadow-[4px_4px_0px_var(--c-ink)]">
+          <Zap className="w-8 h-8 md:w-12 md:h-12 fill-[var(--c-orange)] text-[var(--c-orange)]" />
         </div>
       </div>
 
-      <div className={`parallax-layer absolute top-[5%] md:top-auto md:bottom-24 inset-inline-end-[2%] md:left-24 md:inset-inline-start-auto opacity-30 lg:opacity-100 z-50`}>
-        <div className="relative w-32 h-32 md:w-48 md:h-48 flex items-center justify-center">
+      <div className={`parallax-layer absolute top-4 md:top-auto md:bottom-24 left-1/2 -translate-x-1/2 md:left-24 md:translate-x-0 opacity-20 md:opacity-100 z-50`}>
+        <div className="relative w-24 h-24 md:w-48 md:h-48 flex items-center justify-center">
           {/* Circular Text */}
-          <svg viewBox="0 0 100 100" className="w-full h-full animate-[spin_10s_linear_infinite]">
+          <svg viewBox="0 0 100 100" className="w-full h-full animate-[spin_12s_linear_infinite]">
             <defs>
               <path id="circlePath" d="M 50, 50 m -38, 0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
             </defs>
-            <text className="text-[8.5px] font-black uppercase fill-[var(--c-ink)] tracking-[0.2em]">
+            <text className="text-[10px] md:text-[8.5px] font-black uppercase fill-[var(--c-ink)] tracking-[0.2em]">
               <textPath href="#circlePath">
-                {t("FREE PALESTINE • فلسطين حرة • ", "فلسطين حرة • FREE PALESTINE • ")}
                 {t("FREE PALESTINE • فلسطين حرة • ", "فلسطين حرة • FREE PALESTINE • ")}
               </textPath>
             </text>
           </svg>
           {/* Central Flag */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <BrutalFlag code="ps" size="w-12 h-12 md:w-20 md:h-20" className="border-4 shadow-[4px_4px_0px_var(--c-red)]" />
+            <BrutalFlag code="ps" size="w-10 h-10 md:w-20 md:h-20" className="border-4 shadow-[3px_3px_0px_var(--c-red)]" />
           </div>
         </div>
       </div>
