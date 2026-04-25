@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useAdminStatus } from "@/components/ControlledChaos/AdminStatusContext";
 import { StatusRing } from "@/components/ControlledChaos/StatusRing";
 import { StoryViewer } from "@/components/ControlledChaos/StoryViewer";
+import { formatGems } from "@/lib/utils";
 
 const LEVEL_CONFIG = [
   { id: "low", name: "Novice", ar: "مبتديء", color: "#ccff00", xp: 0 },
@@ -220,7 +221,7 @@ export default function ProfilePage() {
                         <GemIcon size={16} className="group-hover:animate-bounce" />
                         <div className="flex flex-col leading-none">
                            <span className="text-[9px] font-black uppercase opacity-60">{t("Wallet Balance", "رصيد المحفظة")}</span>
-                           <span className="text-sm font-black tracking-tight">{balance.toLocaleString()} <span className="text-[10px] opacity-70">GEMS</span></span>
+                           <span className="text-sm font-black tracking-tight">{formatGems(balance)} <span className="text-[10px] opacity-70">GEMS</span></span>
                         </div>
                         <Plus className="w-3 h-3 ml-1" strokeWidth={4} />
                      </Link>
@@ -329,7 +330,7 @@ export default function ProfilePage() {
                     <div className="hidden md:flex flex-col items-end">
                       <span className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-1">{t("Balance", "الرصيد")}</span>
                       <div className="text-xl font-black text-black bg-[#ccff00] px-3 py-1 border-2 border-black">
-                        {balance.toLocaleString()}
+                        {formatGems(balance)}
                       </div>
                     </div>
                     <ChevronDown className={`w-8 h-8 transition-transform duration-300 ${isWalletExpanded ? 'rotate-180' : ''}`} />
@@ -347,7 +348,7 @@ export default function ProfilePage() {
                       <div className="flex flex-col items-end">
                         <span className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-1">{t("Current Balance", "الرصيد الحالي")}</span>
                         <div className="text-4xl md:text-5xl font-black text-black bg-[#ccff00] px-4 py-2 border-4 border-black relative">
-                          {balance.toLocaleString()}
+                          {formatGems(balance)}
                           <span className="absolute -top-3 -right-3 rotate-12 bg-black text-[#ccff00] text-xs font-black px-2 py-0.5 border-2 border-white">Gems</span>
                         </div>
                       </div>

@@ -12,6 +12,7 @@ import { useOrders } from "@/components/ControlledChaos/OrderContext";
 import { VideoTutorialModal } from "@/components/ControlledChaos/VideoTutorialModal";
 import { useWallet } from "@/components/ControlledChaos/WalletContext";
 import { GemIcon } from "@/components/ControlledChaos/GemIcon";
+import { formatGems } from "@/lib/utils";
 
 const PKG_IMAGES = [
   "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&q=80", 
@@ -292,7 +293,7 @@ export default function GameDetailPage() {
                 to="/buy-gems" 
                 className="md:hidden flex flex-row items-center gap-1 border-2 px-1.5 py-1 transition-all text-xs font-black cursor-pointer bg-[#b084ff] text-black border-black shadow-[2px_2px_0px_#000]"
               >
-                 <span>{balance}</span>
+                 <span>{formatGems(balance)}</span>
                  <GemIcon size={14} />
               </Link>
             )}
@@ -311,7 +312,7 @@ export default function GameDetailPage() {
                 to="/buy-gems" 
                 className="hidden md:flex flex-row items-center gap-2 border-2 px-2.5 py-1 transition-all text-sm font-black hover:-translate-y-0.5 cursor-pointer bg-[#b084ff] text-black border-black shadow-[2px_2px_0px_#000] hover:shadow-[4px_4px_0px_#000]"
               >
-                 <span>{balance.toLocaleString()}</span>
+                 <span>{formatGems(balance)}</span>
                  <GemIcon size={16} />
               </Link>
             )}
@@ -319,7 +320,7 @@ export default function GameDetailPage() {
         </div>
 
         {/* Banner */}
-        <div className="relative h-64 md:h-80 overflow-hidden border-b-4 border-[var(--c-ink)]">
+        <div className="relative h-80 md:h-[500px] overflow-hidden border-b-4 border-[var(--c-ink)]">
           <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${game.image})` }} />
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative z-10 h-full flex flex-col justify-end p-8 md:p-12">
@@ -639,7 +640,7 @@ export default function GameDetailPage() {
                                    disabled={!isFormValid || !hasEnough} 
                                    className={`w-full bg-[#101010] text-white px-6 py-5 text-xl font-black uppercase flex items-center justify-center gap-2 transition-all shadow-[6px_6px_0px_#b084ff] hover:translate-x-1 hover:translate-y-1 hover:shadow-none ${(!isFormValid || !hasEnough) ? "opacity-30 cursor-not-allowed grayscale" : "hover:bg-[#b084ff]"}`}
                                  >
-                                   <GemIcon size={24} /> {t("Pay Instantly", "ادفع فوراً")} ({gemsPrice.toLocaleString()})
+                                   <GemIcon size={24} /> {t("Pay Instantly", "ادفع فوراً")} ({formatGems(gemsPrice)})
                                  </button>
                                  {!hasEnough && isFormValid && (
                                    <p className="text-[10px] font-black uppercase text-red-600 text-center animate-pulse">

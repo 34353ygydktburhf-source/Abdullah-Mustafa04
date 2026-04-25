@@ -77,6 +77,11 @@ export function GlobalStyles() {
           position: absolute;
           animation: gem-burst 1s ease-out forwards;
         }
+
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
       `}</style>
 
       <svg style={{ position: "absolute", width: 0, height: 0 }}>

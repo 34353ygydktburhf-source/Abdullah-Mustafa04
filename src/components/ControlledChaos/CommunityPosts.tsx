@@ -9,6 +9,10 @@ import { useLogin } from "./LoginContext";
 import { useNotifications } from "./NotificationContext";
 import { useLang } from "./LangContext";
 import { Link } from "react-router-dom";
+import { formatGems } from "@/lib/utils";
+import gsap from "gsap";
+
+const GIFT_PRESETS = [50, 100, 500, 1000];
 
 export function CommunityPosts({ onOpenChat }: { onOpenChat: (authorId: string, authorName: string, postId: string) => void }) {
   const { posts, isAuthenticatedDev, verifyDevPin, deletePost, reactToPost, tipPost } = useCommunity();
@@ -112,7 +116,7 @@ ${post.description}
       {visiblePosts.map(post => (
         <div 
           key={post.id} 
-          className={`relative border-[6px] border-[var(--c-ink)] p-4 md:p-8 transition-all duration-300 shadow-[10px_10px_0px_rgba(0,0,0,1)] hover:-translate-y-2 hover:-translate-x-2 hover:shadow-[16px_16px_0px_rgba(0,0,0,1)] hover:bg-[#fffdf0] bg-white group`}
+          className={`relative border-[4px] md:border-[6px] border-[var(--c-ink)] p-4 md:p-8 transition-all duration-300 shadow-[6px_6px_0px_rgba(0,0,0,1)] md:shadow-[10px_10px_0px_rgba(0,0,0,1)] hover:-translate-y-1 md:hover:-translate-y-2 hover:-translate-x-1 md:hover:-translate-x-2 hover:shadow-[10px_10px_0px_rgba(0,0,0,1)] md:hover:shadow-[16px_16px_0px_rgba(0,0,0,1)] hover:bg-[#fffdf0] bg-white group`}
         >
           {/* Chaotic Background Pattern purely for aesthetics */}
           <div className="absolute inset-0 opacity-0 group-hover:opacity-5 pointer-events-none transition-opacity bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black via-transparent to-transparent bg-[length:20px_20px]"></div>
@@ -241,87 +245,120 @@ ${post.description}
           </div>
 
           {/* Reactions Summary */}
-          <div className="flex items-center gap-3 mb-4 py-2 border-y-2 border-black/5 justify-between">
-             <div className="flex items-center gap-3">
-               <div className="flex -space-x-1">
-                  {Object.entries(post.reactions || {}).map(([type, count]) => (
-                    count > 0 && <span key={type} title={type} className="text-xs">{reactionEmojis[type as keyof Reactions]}</span>
-                  ))}
-               </div>
-               <p className="text-[10px] font-black opacity-60">
-                  {Object.values(post.reactions || {}).reduce((a, b) => a + b, 0)} تفاعل
-               </p>
+          <div className="flex items-center gap-3 mb-4 py-2 border-y-2 border-black/5 justify-between flex-wrap">
+             <div className="flex items-center gap-2 flex-wrap">
+                {Object.entries(post.reactions || {}).map(([type, count]) => (
+                  count > 0 && (
+                    <div 
+                      key={type} 
+                      className="flex items-center gap-1 bg-white border-2 border-black px-2 py-0.5 rounded-full shadow-[2px_2px_0px_#000] animate-in zoom-in-95 duration-300"
+                    >
+                      <span className="text-xs">{reactionEmojis[type as keyof Reactions]}</span>
+                      <span className="text-[10px] font-black">{count}</span>
+                    </div>
+                  )
+                ))}
+                {Object.values(post.reactions || {}).reduce((a, b) => a + b, 0) === 0 && (
+                  <p className="text-[10px] font-black opacity-30 uppercase tracking-widest">{t("No reactions yet", "لا يوجد تفاعلات بعد")}</p>
+                )}
              </div>
              {post.tippedGems && post.tippedGems > 0 ? (
-               <div className="flex items-center gap-1 bg-[#ccff00] px-2 py-0.5 border-2 border-black shadow-[2px_2px_0px_#000]">
+               <div className="flex items-center gap-1 bg-[#ccff00] px-2 py-0.5 border-2 border-black shadow-[2px_2px_0px_#000] animate-pulse">
                   <GemIcon size={12} />
-                  <span className="text-[10px] font-black uppercase text-black">+{post.tippedGems} مهداة</span>
+                  <span className="text-[10px] font-black uppercase text-black">+{formatGems(post.tippedGems)} مهداة</span>
                </div>
              ) : null}
           </div>
 
-          <div className="flex flex-wrap items-center justify-start gap-2 md:gap-4 border-t-4 border-[var(--c-ink)]/10 pt-4 relative">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-start gap-2 md:gap-4 border-t-4 border-[var(--c-ink)]/10 pt-4 relative">
               {/* Interaction Bar */}
-              <div className="relative group/reaction flex-1 min-w-[70px] md:flex-none">
+              <div className="relative group/reaction flex-1 min-w-0 sm:flex-none">
                 <button 
                   onClick={() => setActiveReactionPicker(activeReactionPicker === post.id ? null : post.id)}
-                  className={`w-full flex items-center justify-center gap-1 md:gap-2 px-2 md:px-4 py-2 md:py-3 font-black uppercase text-[9px] md:text-xs border-4 border-black transition-colors shadow-[3px_3px_0px_#000] md:shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none ${activeReactionPicker === post.id ? 'bg-[var(--c-lime)] text-black' : 'bg-white text-black hover:bg-gray-100'}`}
+                  className={`w-full flex items-center justify-center gap-2 px-4 py-3 font-black uppercase text-xs border-4 border-black transition-colors shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none ${activeReactionPicker === post.id ? 'bg-[var(--c-lime)] text-black' : 'bg-white text-black hover:bg-gray-100'}`}
                 >
-                  <ThumbsUp className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">أعجبني</span>
+                  <ThumbsUp className="w-4 h-4" /> <span className="sm:inline">أعجبني</span>
                 </button>
                 
-                {/* Reaction Picker Popup */}
-                {activeReactionPicker === post.id && (
-                  <div className="absolute bottom-full right-0 mb-4 flex items-center gap-1 sm:gap-2 bg-[#f4f4f4] border-4 border-black p-2 sm:p-3 shadow-[8px_8px_0px_#000] animate-in zoom-in-95 duration-200 z-[100]">
-                    <div className="absolute -bottom-2.5 right-6 w-4 h-4 bg-[#f4f4f4] border-b-4 border-r-4 border-black rotate-45"></div>
-                    {(Object.keys(reactionEmojis) as Array<keyof Reactions>).map((type) => (
-                      <button 
-                        key={type}
-                        onClick={() => {
-                          reactToPost(post.id, type);
-                          setActiveReactionPicker(null);
-                        }}
-                        className="text-2xl sm:text-3xl hover:-translate-y-2 hover:scale-125 transition-transform duration-200 p-1 sm:p-2 cursor-pointer bg-white border-2 border-transparent hover:border-black hover:shadow-[2px_2px_0px_#000] rounded-sm"
-                        title={type}
-                      >
-                        {reactionEmojis[type]}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {/* Reaction Picker Overlay for Mobile handled outside loop to prevent clipping */}
               </div>
 
               {/* Gift Gems Button */}
-              <div className="relative flex-1 min-w-[70px] md:flex-none">
+              <div className="relative flex-1 min-w-0 sm:flex-none">
                 <button 
                   onClick={() => isLoggedIn ? setGiftPromptId(giftPromptId === post.id ? null : post.id) : openLogin()}
-                  className="w-full flex items-center justify-center gap-1 md:gap-2 bg-white text-black px-2 md:px-4 py-2 md:py-3 font-black uppercase text-[9px] md:text-xs border-4 border-black hover:bg-[#ccff00] hover:text-black transition-colors shadow-[3px_3px_0px_#000] md:shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none"
+                  className="w-full flex items-center justify-center gap-2 bg-white text-black px-4 py-3 font-black uppercase text-xs border-4 border-black hover:bg-[#ccff00] hover:text-black transition-colors shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none"
                 >
-                  <Gift className="w-3 h-3 md:w-4 md:h-4 text-[#b084ff]" /> <span className="hidden sm:inline">إهداء</span>
+                  <Gift className="w-4 h-4 text-[#b084ff]" /> <span className="sm:inline">إهداء</span>
                 </button>
 
                 {giftPromptId === post.id && (
-                  <div className="absolute bottom-full right-0 mb-4 w-64 bg-white border-4 border-[var(--c-ink)] p-4 shadow-[4px_4px_0px_var(--c-ink)] z-[100] animate-in zoom-in-95 duration-200">
-                    <p className="text-[10px] font-black uppercase mb-2 flex items-center gap-1">إهداء لصاحب المنشور: <GemIcon size={12}/></p>
-                    <div className="flex gap-2">
-                      <input 
-                        type="number" 
-                        min="1"
-                        value={giftAmount}
-                        onChange={(e) => setGiftAmount(parseInt(e.target.value) || 0)}
-                        className="flex-1 border-2 border-black p-1 text-xs font-black outline-none bg-[#fffbf0]"
-                      />
+                  <div className="fixed inset-0 z-[300] flex items-end md:items-center justify-center p-0 md:p-4 animate-in fade-in duration-200">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setGiftPromptId(null)}></div>
+                    <div className="relative w-full md:max-w-md bg-[#fffbf0] border-t-8 md:border-8 border-black p-6 md:p-8 shadow-[0_-10px_0_rgba(0,0,0,0.1)] md:shadow-[12px_12px_0px_#ccff00] animate-in slide-in-from-bottom-full md:slide-in-from-bottom-5 duration-300">
                       <button 
-                        onClick={() => {
-                           if (giftAmount > 0 && spendGems(giftAmount, `إهداء لصاحب المنشور: ${post.authorName}`)) {
-                             tipPost(post.id, giftAmount);
-                             setGiftPromptId(null);
-                           }
-                        }}
-                        className="bg-[#b084ff] text-white px-2 py-1 font-black text-[10px] uppercase border-2 border-black shadow-[2px_2px_0px_#000] active:translate-y-0.5 active:shadow-none transition-all"
+                        onClick={() => setGiftPromptId(null)}
+                        className="absolute top-4 right-4 bg-white border-2 border-black p-1 hover:bg-black hover:text-white transition-colors"
                       >
-                        إرسال
+                        <X className="w-5 h-5" />
                       </button>
+
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="bg-[var(--c-purple)] p-3 border-4 border-black shadow-[4px_4px_0px_#000]">
+                          <Gift className="w-8 h-8 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-black uppercase leading-tight">{t("Gift Gems", "إهداء جواهر")}</h3>
+                          <p className="text-[10px] font-bold opacity-60 uppercase">{t("To:", "إلى:")} {post.authorName}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <div>
+                          <label className="block text-[10px] font-black uppercase mb-2 opacity-50">{t("Select Amount", "اختر الكمية")}</label>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {GIFT_PRESETS.map(amt => (
+                              <button 
+                                key={amt}
+                                onClick={() => setGiftAmount(amt)}
+                                className={`py-4 md:py-2 border-2 border-black font-black text-sm transition-all shadow-[2px_2px_0px_#000] active:translate-y-0.5 active:shadow-none ${giftAmount === amt ? 'bg-[#ccff00] text-black' : 'bg-white hover:bg-gray-50'}`}
+                              >
+                                {amt}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-black uppercase mb-2 opacity-50">{t("Custom Amount", "كمية مخصصة")}</label>
+                          <div className="flex flex-col sm:flex-row gap-3">
+                            <div className="flex-1 relative">
+                              <input 
+                                type="number" 
+                                min="1"
+                                value={giftAmount}
+                                onChange={(e) => setGiftAmount(parseInt(e.target.value) || 0)}
+                                className="w-full border-4 border-black p-4 md:p-3 text-2xl md:text-xl font-black outline-none bg-white focus:bg-[#ccff00]/10 transition-colors"
+                              />
+                              <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">
+                                <GemIcon size={32} className="md:w-6 md:h-6" />
+                              </div>
+                            </div>
+                            <button 
+                              onClick={() => {
+                                 if (giftAmount > 0 && spendGems(giftAmount, `إهداء لصاحب المنشور: ${post.authorName}`)) {
+                                   tipPost(post.id, giftAmount);
+                                   setGiftPromptId(null);
+                                   addNotification(t("Gems Sent!", "تم الإرسال!"), t("Your gift has been sent successfully.", "تم إرسال هديتك بنجاح."), "success");
+                                 }
+                              }}
+                              className="bg-[#b084ff] text-white px-8 py-4 md:py-0 font-black uppercase text-base md:text-sm border-4 border-black shadow-[6px_6px_0px_#000] md:shadow-[4px_4px_0px_#000] hover:bg-black hover:shadow-none active:translate-y-1 transition-all"
+                            >
+                              {t("Send", "إرسال")}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -329,23 +366,23 @@ ${post.description}
 
               <button 
                 onClick={() => onOpenChat(post.authorId, post.authorName, post.id)}
-                className="flex-1 min-w-[70px] md:flex-none flex items-center justify-center gap-1 md:gap-2 bg-white text-black px-2 md:px-4 py-2 md:py-3 font-black uppercase text-[9px] md:text-xs border-4 border-black hover:bg-[var(--c-orange)] hover:text-white transition-colors shadow-[3px_3px_0px_#000] md:shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none"
+                className="flex-1 min-w-0 sm:flex-none flex items-center justify-center gap-2 bg-white text-black px-4 py-3 font-black uppercase text-xs border-4 border-black hover:bg-[var(--c-orange)] hover:text-white transition-colors shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none"
               >
-                <MessageSquare className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">تواصل</span>
+                <MessageSquare className="w-4 h-4" /> <span className="sm:inline">تواصل</span>
               </button>
 
               <button 
                 onClick={() => sendToAdmin(post)}
-                className="flex-1 min-w-[70px] md:flex-none flex items-center justify-center gap-1 md:gap-2 bg-[var(--c-lime)] text-black px-2 md:px-4 py-2 md:py-3 font-black uppercase text-[9px] md:text-xs border-4 border-black hover:bg-black hover:text-[var(--c-lime)] transition-colors shadow-[3px_3px_0px_#000] md:shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none"
+                className="flex-1 min-w-0 sm:flex-none flex items-center justify-center gap-2 bg-[var(--c-lime)] text-black px-4 py-3 font-black uppercase text-xs border-4 border-black hover:bg-black hover:text-[var(--c-lime)] transition-colors shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none"
               >
-                <Send className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">للمسؤول</span>
+                <Send className="w-4 h-4" /> <span className="sm:inline">للمسؤول</span>
               </button>
 
               <button 
                 onClick={() => handleNativeShare(post)}
-                className="flex-1 min-w-[70px] md:flex-none flex items-center justify-center gap-1 md:gap-2 bg-black text-white px-2 md:px-4 py-2 md:py-3 font-black uppercase text-[9px] md:text-xs border-4 border-black hover:bg-[var(--c-purple)] transition-colors shadow-[3px_3px_0px_#000] md:shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none"
+                className="col-span-2 sm:col-auto sm:flex-none flex items-center justify-center gap-2 bg-black text-white px-4 py-3 font-black uppercase text-xs border-4 border-black hover:bg-[var(--c-purple)] transition-colors shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none"
               >
-                <Share2 className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">مشاركة</span>
+                <Share2 className="w-4 h-4" /> <span className="sm:inline">مشاركة العرض</span>
               </button>
 
               {isAuthenticatedDev && (
@@ -381,6 +418,37 @@ ${post.description}
           </div>
         </div>
       ))}
+
+      {/* Global Reaction Picker (Outside loop to prevent clipping by card transforms) */}
+      {activeReactionPicker && (
+        <>
+          {/* Backdrop for all devices to ensure focus */}
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-[4px] z-[400]" onClick={() => setActiveReactionPicker(null)}></div>
+          
+          <div className="fixed bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 flex items-center justify-center z-[500] w-full px-4 pointer-events-none">
+            <div className="pointer-events-auto flex items-center gap-1 md:gap-3 bg-white border-4 border-black p-4 md:p-6 shadow-[0_16px_0_#000] animate-in zoom-in-95 slide-in-from-bottom-10 duration-300 w-full max-w-[380px] justify-around relative">
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-1 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                {t("What's your reaction?", "ما هو تفاعلك؟")}
+              </div>
+              {(Object.keys(reactionEmojis) as Array<keyof Reactions>).map((type) => (
+                <button 
+                  key={type}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    reactToPost(activeReactionPicker, type);
+                    setActiveReactionPicker(null);
+                    gsap.fromTo(e.currentTarget, { scale: 1.5, y: -20 }, { scale: 1, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                  }}
+                  className="text-3xl md:text-4xl hover:-translate-y-3 hover:scale-125 transition-all duration-300 p-2 md:p-3 cursor-pointer bg-[#f8f8f8] border-2 border-transparent hover:border-black hover:shadow-[4px_4px_0px_#000] rounded-xl active:bg-[var(--c-lime)] flex items-center justify-center shrink-0 w-12 h-12 md:w-16 md:h-16"
+                  title={type}
+                >
+                  <span className="leading-none">{reactionEmojis[type]}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Fullscreen Lightbox Modal */}
       {lightbox && (

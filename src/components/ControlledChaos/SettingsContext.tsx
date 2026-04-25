@@ -11,6 +11,7 @@ export interface SiteSettings {
   currencySuffix: boolean;
   paymentAccounts: { id: string; name: string; value: string; countryCode?: string }[];
   notificationsEnabled: boolean;
+  bannerImages: string[];
 }
 
 const DEFAULT_SETTINGS: SiteSettings = {
@@ -28,7 +29,12 @@ const DEFAULT_SETTINGS: SiteSettings = {
     { id: "3", name: "PayPal", value: "allord@store.com", countryCode: "global" },
     { id: "4", name: "Binance Wallet", value: "ID: 15487723", countryCode: "global" }
   ],
-  notificationsEnabled: true
+  notificationsEnabled: true,
+  bannerImages: [
+    "https://i.pinimg.com/1200x/2c/68/d9/2c68d9f10928a6f3a388147d337d4062.jpg",
+    "https://i.pinimg.com/1200x/41/6e/f4/416ef493cba6e992c2e32e0468d9d033.jpg",
+    "https://i.pinimg.com/1200x/61/ea/f4/61eaf493cba6e992c2e32e0468d9d033.jpg"
+  ]
 };
 
 interface SettingsContextType {

@@ -10,6 +10,7 @@ import { useSettings } from "@/components/ControlledChaos/SettingsContext";
 import { GemIcon } from "@/components/ControlledChaos/GemIcon";
 import { useLogin } from "@/components/ControlledChaos/LoginContext";
 import { useOrders } from "@/components/ControlledChaos/OrderContext";
+import { formatGems } from "@/lib/utils";
 
 const GemBurstAnimation = () => {
   const gems = Array.from({ length: 12 });
@@ -159,7 +160,7 @@ export default function BuyGemsPage() {
                  <div className="bg-black border-4 border-[#b084ff] p-4 text-center shadow-[6px_6px_0px_#b084ff]">
                     <span className="text-[10px] font-black uppercase tracking-widest opacity-70 block mb-1">{t("Current Balance", "رصيدك الحالي")}</span>
                     <div className="text-3xl font-black text-[#ccff00] flex items-center justify-center gap-2">
-                       {balance.toLocaleString()} <GemIcon size={24} />
+                       {formatGems(balance)} <GemIcon size={24} />
                     </div>
                  </div>
                )}
@@ -187,7 +188,7 @@ export default function BuyGemsPage() {
                     <div className={`mb-2 md:mb-4 ${pack.popular ? 'scale-110 md:scale-150 md:animate-bounce' : 'scale-100 md:scale-125'}`}>
                       <GemIcon size={32} className="md:w-12 md:h-12" />
                     </div>
-                    <div className="text-2xl md:text-5xl font-black">{pack.gems}</div>
+                    <div className="text-2xl md:text-5xl font-black">{formatGems(pack.gems)}</div>
                   </div>
                   
                   <div className="mt-2 md:mt-6 pt-2 md:pt-4 border-t-2 md:border-t-4 border-black/20 w-full">
@@ -281,7 +282,7 @@ export default function BuyGemsPage() {
                    </div>
                    <div className="text-right">
                      <p className="text-sm font-bold opacity-60 uppercase">Amount</p>
-                     <p className="text-2xl font-black text-[#b084ff]">{selectedPack.gems}</p>
+                     <p className="text-2xl font-black text-[#b084ff]">{formatGems(selectedPack.gems)}</p>
                    </div>
                 </div>
 

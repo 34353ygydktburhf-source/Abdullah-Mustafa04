@@ -1261,6 +1261,54 @@ Timestamp: ${new Date(order.timestamp).toLocaleString()}
                   </div>
                 </div>
 
+                <div className="bg-purple-100 border-4 border-black p-6 shadow-[6px_6px_0px_#000]">
+                  <div className="flex justify-between items-center mb-4 border-b-2 border-black/10 pb-2">
+                    <h4 className="font-black uppercase text-sm flex items-center gap-2"> <ImagePlus className="w-4 h-4" /> {t("Banner Advertising Management", "إدارة الإعلانات البانر")} </h4>
+                    <button 
+                      onClick={() => {
+                        const newBanners = [...(settings.bannerImages || []), ""];
+                        updateSettings({ bannerImages: newBanners });
+                      }}
+                      className="bg-black text-white px-3 py-1 text-[8px] font-black uppercase hover:bg-[var(--c-purple)] transition-colors"
+                    >
+                      + {t("Add Banner", "إضافة إعلان")}
+                    </button>
+                  </div>
+                  <div className="space-y-4">
+                    {(settings.bannerImages || []).map((url, index) => (
+                      <div key={index} className="flex gap-4 items-start bg-white border-2 border-black p-3 shadow-[4px_4px_0px_#000]">
+                        <div className="w-20 h-12 border-2 border-black overflow-hidden flex-shrink-0 bg-gray-100">
+                          {url ? <img src={url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[10px] opacity-30 font-black">NO IMG</div>}
+                        </div>
+                        <div className="flex-1">
+                          <input 
+                            value={url} 
+                            placeholder="https://i.pinimg.com/..."
+                            onChange={e => {
+                              const updated = [...settings.bannerImages];
+                              updated[index] = e.target.value;
+                              updateSettings({ bannerImages: updated });
+                            }} 
+                            className="w-full border-2 border-black p-2 font-bold text-xs" 
+                          />
+                        </div>
+                        <button 
+                          onClick={() => {
+                            const updated = settings.bannerImages.filter((_, i) => i !== index);
+                            updateSettings({ bannerImages: updated });
+                          }}
+                          className="bg-red-500 text-white w-8 h-8 border-2 border-black flex items-center justify-center hover:bg-black transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    {(settings.bannerImages || []).length === 0 && (
+                       <p className="text-center text-[10px] font-bold opacity-50 uppercase py-4 border-2 border-dashed border-black">{t("No banners active", "لا يوجد إعلانات مفعلة")}</p>
+                    )}
+                  </div>
+                </div>
+
                 <div className="p-4 bg-red-100 border-4 border-black border-dashed">
                    <button onClick={() => { if(confirm("Reset Settings?")) resetSettings(); adminResetGames(); }} className="bg-red-600 text-white px-4 py-2 text-[10px] font-black uppercase border-2 border-black hover:bg-black transition-colors"> Reset All Data & Settings </button>
                 </div>

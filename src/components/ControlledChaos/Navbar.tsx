@@ -9,6 +9,7 @@ import { NavProfileButton } from "./AccountSystem";
 import { NotificationCenter } from "./NotificationCenter";
 import { useWallet } from "./WalletContext";
 import { GemIcon } from "./GemIcon";
+import { formatGems } from "@/lib/utils";
 
 export function Navbar() {
   const { lang, toggleLang, t } = useLang();
@@ -60,7 +61,7 @@ export function Navbar() {
                   : "bg-[#b084ff] text-black border-black shadow-[2px_2px_0px_#000] hover:shadow-[4px_4px_0px_#000]"
               }`}
             >
-               <span>{balance.toLocaleString()}</span>
+               <span>{formatGems(balance)}</span>
                <GemIcon size={16} />
             </Link>
           )}
@@ -114,7 +115,7 @@ export function Navbar() {
                   : "bg-[#b084ff] text-black border-black shadow-[2px_2px_0px_#000]"
               }`}
             >
-               <span>{balance}</span>
+               <span>{formatGems(balance)}</span>
                <GemIcon size={14} />
             </Link>
           )}

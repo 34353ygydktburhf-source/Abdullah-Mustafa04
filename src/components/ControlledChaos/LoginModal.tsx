@@ -20,17 +20,6 @@ export function LoginModal() {
 
   if (!isLoginOpen) return null;
 
-  const scrollModal = (offset: number) => {
-    if (modalScrollRef.current) {
-      modalScrollRef.current.scrollBy({ top: offset, behavior: 'smooth' });
-    }
-  };
-
-  const scrollTerms = (offset: number) => {
-    if (termsScrollRef.current) {
-      termsScrollRef.current.scrollBy({ top: offset, behavior: 'smooth' });
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +52,7 @@ export function LoginModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
@@ -75,37 +64,20 @@ export function LoginModal() {
         {/* Shadow */}
         <div className="absolute inset-0 bg-[var(--c-orange)] translate-x-3 translate-y-3 border-4 border-[var(--c-ink)]" />
 
-        <div className="relative border-4 border-[var(--c-ink)] p-4 pr-14" style={{ backgroundColor: "var(--c-bg)", color: "var(--c-ink)" }}>
+        <div className="relative border-4 border-[var(--c-ink)] p-6 md:p-8" style={{ backgroundColor: "var(--c-bg)", color: "var(--c-ink)" }}>
           {/* Close */}
           {status !== "loading" && status !== "success" && (
             <button
               onClick={closeLogin}
-              className="absolute top-4 right-4 w-8 h-8 border-2 border-[var(--c-ink)] flex items-center justify-center hover:bg-[var(--c-ink)] hover:text-[var(--c-bg)] transition-colors z-30"
+              className="absolute top-4 left-4 w-10 h-10 border-4 border-[var(--c-ink)] flex items-center justify-center bg-white hover:bg-[var(--c-ink)] hover:text-[var(--c-bg)] transition-colors z-[60] shadow-[3px_3px_0px_#000]"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           )}
 
-          {/* Custom Modal Scroll Arrows */}
-          <div className="absolute top-16 bottom-4 right-2 w-10 flex flex-col gap-2 z-20">
-            <button 
-              onClick={() => scrollModal(-100)} 
-              className="w-10 h-12 flex items-center justify-center bg-[var(--c-orange)] border-4 border-[var(--c-ink)] text-[var(--c-ink)] hover:bg-[var(--c-lime)] transition-colors shadow-[2px_2px_0px_#000]"
-            >
-              <ChevronUp className="w-6 h-6" />
-            </button>
-            <div className="flex-1 border-x-4 border-[var(--c-ink)]/20 mx-auto w-1 my-1"></div>
-            <button 
-              onClick={() => scrollModal(100)} 
-              className="w-10 h-12 flex items-center justify-center bg-[var(--c-orange)] border-4 border-[var(--c-ink)] text-[var(--c-ink)] hover:bg-[var(--c-lime)] transition-colors shadow-[2px_2px_0px_#000]"
-            >
-              <ChevronDown className="w-6 h-6" />
-            </button>
-          </div>
-
           <div 
             ref={modalScrollRef}
-            className="max-h-[85vh] py-8 overflow-y-auto scroll-smooth touch-pan-y [-webkit-overflow-scrolling:touch] pointer-events-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] pr-2"
+            className="max-h-[85vh] py-8 overflow-y-auto scroll-smooth touch-pan-y [-webkit-overflow-scrolling:touch] pointer-events-auto [scrollbar-width:thin] scrollbar-hide"
           >
 
           {status === "success" ? (
@@ -146,7 +118,7 @@ export function LoginModal() {
             </div>
           ) : (
             <>
-              <div className="mb-6 pr-8">
+              <div className="mb-6 mt-4">
                 <h3 className="text-4xl font-black uppercase mb-2 leading-none">
                   <span className="font-marker text-[var(--c-purple)]">{t("LOG IN", "تسجيل")}</span><br />
                   {t("TO YOUR ACCOUNT", "الدخول")}
@@ -266,28 +238,10 @@ export function LoginModal() {
 
                       {showTerms && (
                         <div className="mt-4 pt-4 border-t-4 border-[var(--c-ink)] relative transition-all duration-300">
-                          {/* Custom Scroll Arrows */}
-                          <div className={`absolute top-4 bottom-0 ${lang === "ar" ? "left-0" : "right-0"} w-8 flex flex-col gap-1 z-20`}>
-                            <button 
-                              type="button"
-                              onClick={() => scrollTerms(-50)} 
-                              className="w-8 h-10 flex items-center justify-center bg-[var(--c-orange)] border-2 border-[var(--c-ink)] text-[var(--c-ink)] hover:bg-[var(--c-lime)] transition-colors shadow-[2px_2px_0px_#000]"
-                            >
-                              <ChevronUp className="w-5 h-5" />
-                            </button>
-                            <div className="flex-1 border-x-2 border-[var(--c-ink)]/20 mx-auto w-1 my-1"></div>
-                            <button 
-                              type="button"
-                              onClick={() => scrollTerms(50)} 
-                              className="w-8 h-10 flex items-center justify-center bg-[var(--c-orange)] border-2 border-[var(--c-ink)] text-[var(--c-ink)] hover:bg-[var(--c-lime)] transition-colors shadow-[2px_2px_0px_#000]"
-                            >
-                              <ChevronDown className="w-5 h-5" />
-                            </button>
-                          </div>
 
                           <div 
                             ref={termsScrollRef}
-                            className={`h-40 overflow-y-auto text-[10px] font-bold leading-relaxed scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${lang === "ar" ? "pl-10" : "pr-10"}`}
+                            className={`h-40 overflow-y-auto text-[10px] font-bold leading-relaxed scroll-smooth [scrollbar-width:thin] scrollbar-hide`}
                           >
                             {lang === "ar" ? (
                               <div className="text-right space-y-2">

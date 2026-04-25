@@ -76,7 +76,7 @@ export const INITIAL_GAMES_DATA: GameItem[] = [
     cat: "MOBILE",
     tags: ["CP", "Top-Up", "Mobile"],
     color: "bg-[#b084ff]",
-    image: "https://i.pinimg.com/1200x/4b/4b/79/4b4b798418f401f86643cf641a08d8fa.jpg",
+    image: "",
     desc: "COD Points and Battle Pass for COD Mobile.",
     descAr: "نقاط COD وتصريح المعركة.",
     category: "mobile",
