@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, CheckCircle, Plus, ShieldCheck, Zap, Diamond, CreditCard, X, Upload, Copy } from "lucide-react";
 import { GlobalStyles } from "@/components/ControlledChaos/GlobalStyles";
 import { Navbar } from "@/components/ControlledChaos/Navbar";
@@ -49,6 +49,8 @@ export default function BuyGemsPage() {
   const [selectedPack, setSelectedPack] = useState<GemPackage | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [customAmount, setCustomAmount] = useState<string>(searchParams.get("amount") || "25");
 
   // Real checkout states
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -59,13 +61,24 @@ export default function BuyGemsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const formatPrice = (priceInUSD: number, gemsCount?: number) => {
-    if (settings.currencySymbol === "ج.م" && gemsCount) {
-      const finalVal = Math.ceil(gemsCount * 0.9);
-      return `${finalVal} ${settings.currencySymbol}`;
+    // If gemsCount is provided, use the dynamic gemPrice from settings
+    if (gemsCount) {
+      const finalVal = gemsCount * (settings.gemPrice || 0.9);
+      // Format to 2 decimal places if there are decimals, otherwise show whole number
+      const displayVal = finalVal % 1 === 0 ? finalVal.toString() : finalVal.toFixed(2);
+      
+      return settings.currencySuffix 
+        ? `${displayVal} ${settings.currencySymbol}`
+        : `${settings.currencySymbol} ${displayVal}`;
     }
-    const rate = settings.currencySymbol === "ج.م" ? 48 : 1;
+    
+    // Fallback for packages if they have a USD price and we need to convert
+    const rate = settings.currencySymbol === "ج.م" ? 50 : 1; // Default rate if no gemPrice logic applied
     const finalVal = Math.round(priceInUSD * rate);
-    return `${finalVal} ${settings.currencySymbol}`;
+    
+    return settings.currencySuffix 
+      ? `${finalVal} ${settings.currencySymbol}`
+      : `${settings.currencySymbol} ${finalVal}`;
   };
 
   const handleProofUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,7 +102,7 @@ export default function BuyGemsPage() {
     if (!selectedPack || !transferProof) return;
     setIsProcessing(true);
     
-    const finalVal = settings.currencySymbol === "ج.م" ? Math.ceil(selectedPack.gems * 0.9) : Math.round(selectedPack.price);
+    const finalVal = selectedPack.gems * (settings.gemPrice || 0.9);
 
     const orderId = addOrder({
       userId: userData?.id || userData?.name || "USER-GUEST",
@@ -201,6 +214,64 @@ export default function BuyGemsPage() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Custom Amount */}
+            <div className="mt-8 border-4 border-[#ccff00] p-6 bg-black text-white relative group hover:-translate-y-1 shadow-[6px_6px_0px_#ccff00] md:shadow-[10px_10px_0px_#ccff00] transition-transform duration-300">
+              <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                <GemIcon size={120} />
+              </div>
+              <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
+                <div className="flex-1 w-full">
+                  <h3 className="font-black text-2xl md:text-4xl uppercase mb-2 text-[#ccff00]">{t("Custom Amount", "كمية مخصصة")}</h3>
+                  <p className="font-bold text-sm opacity-80 uppercase mb-4">{t("Enter an amount between 25 and 1000 gems", "أدخل كمية بين 25 و 1000 جوهرة")}</p>
+                  
+                  <div className="flex items-center bg-white border-4 border-black p-2 max-w-sm">
+                    <GemIcon size={32} className="mx-2 text-black" />
+                    <input 
+                      type="number" 
+                      min="25" 
+                      max="1000"
+                      value={customAmount}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        if (val > 1000) setCustomAmount("1000");
+                        else setCustomAmount(e.target.value);
+                      }}
+                      className="w-full text-3xl font-black text-black outline-none bg-transparent"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex flex-col items-center md:items-end w-full md:w-auto">
+                  <div className="text-4xl font-black mb-4">
+                    {formatPrice(0, parseInt(customAmount) || 25)}
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const gems = parseInt(customAmount) || 25;
+                      if (gems < 25) return;
+                      if (isLoggedIn) {
+                        setSelectedPack({
+                          id: "custom",
+                          name: "كمية مخصصة",
+                          nameEn: "Custom Amount",
+                          gems: gems,
+                          price: gems * (settings.gemPrice || 0.9),
+                          popular: false,
+                          color: "#ccff00"
+                        });
+                      } else {
+                        openLogin();
+                      }
+                    }}
+                    disabled={(parseInt(customAmount) || 0) < 25}
+                    className="w-full md:w-auto bg-[#ff5e00] text-black font-black uppercase px-8 py-4 border-4 border-black hover:bg-white hover:text-black transition-all shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none text-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {t("Buy Custom Amount", "شراء هذه الكمية")}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Perks Strip */}
@@ -366,7 +437,7 @@ export default function BuyGemsPage() {
 
                 <div className="flex items-center justify-between mb-6 border-y-4 border-black border-dashed py-3">
                    <span className="font-black uppercase text-lg">{t("Total to pay", "الإجمالي")}</span>
-                   <span className="font-black uppercase text-2xl bg-[#ccff00] px-3 py-1 border-2 border-black">{formatPrice(selectedPack.price)}</span>
+                   <span className="font-black uppercase text-2xl bg-[#ccff00] px-3 py-1 border-2 border-black">{formatPrice(0, selectedPack.gems)}</span>
                 </div>
 
                 <button 

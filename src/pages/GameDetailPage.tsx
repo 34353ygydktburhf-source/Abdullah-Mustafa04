@@ -11,6 +11,7 @@ import { useLogin } from "@/components/ControlledChaos/LoginContext";
 import { useOrders } from "@/components/ControlledChaos/OrderContext";
 import { VideoTutorialModal } from "@/components/ControlledChaos/VideoTutorialModal";
 import { useWallet } from "@/components/ControlledChaos/WalletContext";
+import { useMonthlyStore } from "@/components/ControlledChaos/MonthlyStoreContext";
 import { GemIcon } from "@/components/ControlledChaos/GemIcon";
 import { formatGems } from "@/lib/utils";
 
@@ -52,6 +53,8 @@ export default function GameDetailPage() {
   const { savedAccounts, isLoggedIn, userData, openLogin } = useLogin();
   const { addOrder } = useOrders();
   const { balance, spendGems } = useWallet();
+  const { status: monthlyStatus, discount: monthlyDiscount } = useMonthlyStore();
+  const isMonthlyActive = monthlyStatus === 'confirmed';
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPkg, setSelectedPkg] = useState<any | null>(null);
@@ -319,25 +322,27 @@ export default function GameDetailPage() {
           </div>
         </div>
 
-        {/* Banner */}
-        <div className="relative h-80 md:h-[500px] overflow-hidden border-b-4 border-[var(--c-ink)]">
-          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${game.image})` }} />
-          <div className="absolute inset-0 bg-black/50" />
-          <div className="relative z-10 h-full flex flex-col justify-end p-8 md:p-12">
-            <span className="text-xs font-bold uppercase tracking-widest text-[var(--c-lime)] mb-2">{game.cat}</span>
-            <div className="flex items-center gap-4 flex-wrap">
-              <h1 className="text-5xl md:text-7xl font-black uppercase text-white">{game.name}</h1>
-              {game.badge && game.badge.text && (
-                <div className={`${game.badge.color || 'bg-red-500'} text-white px-4 py-2 border-4 border-white shadow-[4px_4px_0px_#000] rotate-3 flex items-center gap-2 animate-bounce`}>
-                  {game.badge.icon === 'Flame' && <Flame className="w-5 h-5" />}
-                  {game.badge.icon === 'Star' && <Star className="w-5 h-5 fill-current" />}
-                  {game.badge.icon === 'Trophy' && <Trophy className="w-5 h-5" />}
-                  {game.badge.icon === 'Sparkles' && <Sparkles className="w-5 h-5" />}
-                  <span className="font-black uppercase text-sm md:text-base">{game.badge.text}</span>
-                </div>
-              )}
+        {/* Compact Game Header */}
+        <div className="relative bg-[var(--c-ink)] text-white overflow-hidden border-b-4 border-[var(--c-ink)]">
+          <div className="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-luminosity blur-sm" style={{ backgroundImage: `url(${game.image})` }} />
+          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/90 to-black/40" />
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center p-6 md:p-10 gap-4 md:gap-6">
+            <img src={game.image} alt={game.name} className="w-20 h-20 md:w-32 md:h-32 rounded-xl md:rounded-2xl object-cover shrink-0" />
+            <div className="flex-1">
+              <div className="flex items-center gap-3 flex-wrap mb-1">
+                <h1 className="text-3xl md:text-5xl font-black uppercase text-white">{game.name}</h1>
+                {game.badge && game.badge.text && (
+                  <div className={`${game.badge.color || 'bg-red-500'} text-white px-2 py-1 md:px-3 md:py-1 border-2 border-white shadow-[2px_2px_0px_#000] rotate-2 flex items-center gap-1 animate-pulse`}>
+                    {game.badge.icon === 'Flame' && <Flame className="w-3 h-3 md:w-4 md:h-4" />}
+                    {game.badge.icon === 'Star' && <Star className="w-3 h-3 md:w-4 md:h-4 fill-current" />}
+                    {game.badge.icon === 'Trophy' && <Trophy className="w-3 h-3 md:w-4 md:h-4" />}
+                    {game.badge.icon === 'Sparkles' && <Sparkles className="w-3 h-3 md:w-4 md:h-4" />}
+                    <span className="font-black uppercase text-[10px] md:text-sm">{game.badge.text}</span>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs md:text-base text-white/70 max-w-2xl line-clamp-2">{t(game.desc, game.descAr || game.desc)}</p>
             </div>
-            <p className="text-lg text-white/80 mt-2 max-w-xl">{t(game.desc, game.descAr || game.desc)}</p>
           </div>
         </div>
 
@@ -392,60 +397,57 @@ export default function GameDetailPage() {
               </BrutalButton>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-6">
               {packages.map((pkg: any, i: number) => {
-                const totalDiscount = (game.discount || 0) + (pkg.discount || 0);
+                const totalDiscount = (game.discount || 0) + (pkg.discount || 0) + (isMonthlyActive ? (monthlyDiscount || 0) : 0);
                 const unitPrice = typeof pkg.price === 'number' ? pkg.price : (parseInt(pkg.price.replace(/\D/g, ""), 10) || 0);
                 const discountedPrice = Math.round(unitPrice * (1 - totalDiscount / 100));
 
                 return (
-                  <div key={pkg.id || i} className="group relative">
-                    <div className={`absolute inset-0 ${pkg.popular ? "bg-[var(--c-orange)]" : game.color} translate-x-3 translate-y-3 border-4 border-[var(--c-ink)]`} />
-                    <div className={`relative ${pkg.popular ? "bg-[var(--c-orange)]" : game.color} border-4 border-[var(--c-ink)] group-hover:translate-x-1 group-hover:translate-y-1 transition-transform duration-300`}>
+                  <button 
+                    key={pkg.id || i} 
+                    onClick={() => openModal({...pkg, unitPrice, discountedPrice, totalDiscount})}
+                    className="group relative w-full text-left outline-none"
+                  >
+                    <div className={`absolute inset-0 ${pkg.popular ? "bg-[var(--c-orange)]" : game.color} translate-x-1.5 translate-y-1.5 md:translate-x-2 md:translate-y-2 border-2 md:border-4 border-[var(--c-ink)]`} />
+                    <div className={`relative ${pkg.popular ? "bg-[var(--c-orange)]" : game.color} border-2 md:border-4 border-[var(--c-ink)] group-hover:-translate-y-1 transition-transform duration-300 flex flex-col h-full bg-white`}>
                       {pkg.popular && (
-                        <div className="absolute top-0 right-0 bg-[var(--c-ink)] text-[var(--c-bg)] px-3 py-1 text-xs font-black uppercase flex items-center gap-1 z-10">
-                          <Star className="w-3 h-3" /> {t("POPULAR", "الأكثر طلباً")}
+                        <div className="absolute top-0 right-0 bg-[var(--c-ink)] text-[var(--c-bg)] px-1.5 py-0.5 md:px-2 md:py-1 text-[8px] md:text-[10px] font-black uppercase flex items-center gap-1 z-10">
+                          <Star className="w-2 h-2 md:w-3 md:h-3" /> {t("POPULAR", "مميز")}
                         </div>
                       )}
                       
                       {totalDiscount > 0 && (
-                        <div className="absolute top-0 left-0 z-20 pointer-events-none -translate-x-2 -translate-y-2">
-                          <div className="bg-red-600 text-white flex flex-col items-center justify-center px-3 py-1.5 border-4 border-black shadow-[3px_3px_0px_rgba(0,0,0,0.3)] relative min-w-[70px]">
-                            <span className="text-[9px] font-black tracking-tighter leading-none mb-0.5 opacity-80">{t("SALE", "خصم")}</span>
-                            <span className="text-xl font-black leading-none">-{totalDiscount}%</span>
+                        <div className="absolute top-0 left-0 z-20 pointer-events-none -translate-x-1 -translate-y-1 md:-translate-x-2 md:-translate-y-2">
+                          <div className="bg-red-600 text-white flex flex-col items-center justify-center px-1.5 py-0.5 md:px-2 md:py-1 border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,0.3)] relative min-w-[30px] md:min-w-[50px]">
+                            <span className="text-[7px] md:text-[8px] font-black tracking-tighter leading-none mb-0 md:mb-0.5 opacity-80">{t("SALE", "خصم")}</span>
+                            <span className="text-[10px] md:text-sm font-black leading-none">-{totalDiscount}%</span>
                           </div>
                         </div>
                       )}
 
-                      <div className="h-36 bg-cover bg-center relative" style={{ backgroundImage: `url(${pkg.image || PKG_IMAGES[i % PKG_IMAGES.length]})` }}>
-                        <div className="absolute inset-0 bg-black/40" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-3xl font-black text-white uppercase">{lang === 'ar' ? (pkg.nameAr || pkg.name) : pkg.name}</span>
-                        </div>
+                      <div className="aspect-square bg-cover bg-center relative border-b-2 md:border-b-4 border-[var(--c-ink)]" style={{ backgroundImage: `url(${pkg.image || PKG_IMAGES[i % PKG_IMAGES.length]})` }}>
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
                       </div>
-                      <div className="p-6">
-                        <h3 className="text-2xl font-black uppercase mb-1">{lang === 'ar' ? (pkg.nameAr || pkg.name) : pkg.name}</h3>
-                        <div className="mb-4">
-                          {totalDiscount > 0 ? (
-                            <div className="flex items-center gap-3">
-                              <span className="text-sm font-bold line-through opacity-50">{formatPrice(unitPrice)}</span>
-                              <span className="text-3xl font-black">{formatPrice(discountedPrice)}</span>
-                            </div>
-                          ) : (
-                            <p className="text-3xl font-black">{formatPrice(unitPrice)}</p>
-                          )}
+                      <div className="p-2 md:p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-[10px] sm:text-xs md:text-sm font-black uppercase mb-1 md:mb-2 line-clamp-2 leading-tight">
+                            {lang === 'ar' ? (pkg.nameAr || pkg.name) : pkg.name}
+                          </h3>
+                          <div className="mt-auto">
+                            {totalDiscount > 0 ? (
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-[8px] md:text-[10px] font-bold line-through opacity-50 leading-none">{formatPrice(unitPrice)}</span>
+                                <span className="text-[11px] sm:text-xs md:text-lg font-black leading-none">{formatPrice(discountedPrice)}</span>
+                              </div>
+                            ) : (
+                              <p className="text-[11px] sm:text-xs md:text-lg font-black leading-none">{formatPrice(unitPrice)}</p>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex flex-col gap-2 mb-5 text-sm font-bold">
-                          <div className="flex items-center gap-2"> <Zap className="w-4 h-4" /> {t("Instant Delivery", "تسليم فوري")} </div>
-                          <div className="flex items-center gap-2"> <ShieldCheck className="w-4 h-4" /> {t("100% Safe", "آمن 100%")} </div>
-                          <div className="flex items-center gap-2"> <Headphones className="w-4 h-4" /> {t("24/7 Support", "دعم 24/7")} </div>
-                        </div>
-                        <button onClick={() => openModal({...pkg, unitPrice, discountedPrice, totalDiscount})} className="w-full bg-[var(--c-ink)] text-[var(--c-bg)] px-4 py-3 text-sm font-black uppercase hover:opacity-90 transition-opacity">
-                          {t("Top Up Now 🎮", "اشحن الآن 🎮")}
-                        </button>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -521,68 +523,67 @@ export default function GameDetailPage() {
                         </div>
                       </div>
 
-                      <div className="mb-6">
-                        <label className="block text-sm font-black uppercase mb-3 text-[var(--c-purple)]">{t("Payment Method", "طريقة الدفع")}</label>
-                        <div className="grid grid-cols-1 gap-2">
-                          {[ 
-                            { id: "gems", label: "Pay with Gems", ar: "ادفع بالجواهر", icon: <GemIcon size={16} /> },
-                            ...settings.paymentAccounts
-                              .filter(acc => acc.countryCode === "eg" && !acc.name.toLowerCase().includes("vodafone"))
-                              .map(acc => ({ 
-                                id: acc.id, 
-                                label: acc.name, 
-                                ar: acc.name, 
-                                icon: <CreditCard className="w-4 h-4" /> 
-                              })),
-                            { id: "other", label: "Other Method", ar: "طريقة أخرى", icon: <Send className="w-4 h-4" /> } 
-                          ].map((pm) => (
-                            <button key={pm.id} type="button" onClick={() => pm.id === "other" ? setIsOtherModalOpen(true) : setPaymentMethod(pm.id)} className={`flex items-center justify-between p-3 border-4 transition-all ${paymentMethod === pm.id ? "border-[var(--c-ink)] bg-[var(--c-lime)] translate-x-1 translate-y-1" : "border-[var(--c-ink)] bg-white hover:bg-[var(--c-lime)]/10 shadow-[4px_4px_0px_var(--c-ink)]"}`}>
-                              <span className="flex items-center gap-3 font-black uppercase text-xs">
-                                 {pm.id === "other" && paymentMethod === "other" && otherMethod ? ( <span className="flex items-center gap-2"> <span className="text-[var(--c-purple)]">{otherMethod}</span> </span> ) : ( <>{pm.icon} {lang === "ar" ? pm.ar : pm.label}</> )}
-                              </span>
-                              {paymentMethod === pm.id && <CheckCircle className="w-4 h-4 text-[var(--c-ink)]" />}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="mt-3 bg-[var(--c-orange)]/10 border-2 border-[var(--c-ink)] p-3 flex items-start gap-2 shadow-[2px_2px_0px_var(--c-ink)]">
-                          <Info className="w-4 h-4 text-[var(--c-orange)] shrink-0 mt-0.5" />
-                          <p className="text-[10px] font-black uppercase leading-tight text-[var(--c-ink)]">
-                            {t("InstaPay is the current default. Change it from 'Other Method' if you want a different wallet or country.", "إنستا باي هي الوسيلة الحالية، قم بتغييرها من زر 'طريقة أخرى' إن كنت تريد محفظة أو دولة مختلفة.")}
-                          </p>
-                        </div>
-                      </div>
+                      {/* Payment Method section removed - Gems only */}
 
-                      <div className="space-y-4 mb-8">
-                        {fieldConfig.fields.map((field: any, idx: number) => {
-                          const suggestions = gameSavedAccounts.filter(acc => acc.accountId.includes(formData[field.key] || ""));
-                          return (
-                          <div key={field.key} className="relative">
-                            <div className="flex items-center justify-between mb-2">
-                              <label className="block text-sm font-black uppercase"> {field.label} {field.required && "*"} </label>
-                              {field.key === 'playerId' && game.tutorialVideoUrl && (
-                                <button 
-                                  onClick={() => setIsTutorialOpen(true)}
-                                  className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[var(--c-orange)] hover:underline"
+                      <div className="space-y-6 mb-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {fieldConfig.fields.map((field: any, idx: number) => {
+                            const suggestions = gameSavedAccounts.filter(acc => acc.accountId.includes(formData[field.key] || ""));
+                            const isHalfWidth = field.key.toLowerCase().includes('id') || field.key.toLowerCase().includes('zone') || field.key.toLowerCase().includes('server');
+                            
+                            return (
+                            <div key={field.key} className={`${isHalfWidth ? 'sm:col-span-1' : 'sm:col-span-2'} relative`}>
+                              <div className="flex items-center justify-between mb-2">
+                                <label className="block text-sm font-black uppercase"> {field.label} {field.required && "*"} </label>
+                                {field.key === 'playerId' && game.tutorialVideoUrl && (
+                                  <button 
+                                    onClick={() => setIsTutorialOpen(true)}
+                                    className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[var(--c-orange)] hover:underline"
+                                  >
+                                    <HelpCircle className="w-3.5 h-3.5" />
+                                    {t("How to get ID?", "كيف تجيب الـ ID؟")}
+                                  </button>
+                                )}
+                              </div>
+                              
+                              {field.type === 'select' ? (
+                                <select 
+                                  value={formData[field.key] || ""} 
+                                  onChange={(e) => setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                                  className="w-full border-4 border-[var(--c-ink)] px-4 py-3 text-lg font-bold bg-white outline-none focus:border-[var(--c-orange)] appearance-none cursor-pointer"
                                 >
-                                  <HelpCircle className="w-3.5 h-3.5" />
-                                  {t("How to get ID?", "كيف تجيب الـ ID؟")}
-                                </button>
+                                  <option value="">{field.placeholder || t("Select option...", "اختر خياراً...")}</option>
+                                  {field.options?.map((opt: any) => (
+                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <input 
+                                  type="text" 
+                                  value={formData[field.key] || ""} 
+                                  onChange={(e) => setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))} 
+                                  onFocus={() => { if(idx === 0) setIsSuggestionsOpen(true); }} 
+                                  onBlur={() => { setTimeout(() => setIsSuggestionsOpen(false), 200); }} 
+                                  placeholder={field.placeholder} 
+                                  className="w-full border-4 border-[var(--c-ink)] px-4 py-3 text-lg font-bold bg-transparent outline-none focus:border-[var(--c-orange)]" 
+                                />
+                              )}
+
+                              {idx === 0 && isSuggestionsOpen && suggestions.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 z-20 border-4 border-[var(--c-ink)] bg-[var(--c-bg)] shadow-[4px_4px_0px_var(--c-ink)] mt-1">
+                                  <div className="bg-[var(--c-lime)] border-b-4 border-[var(--c-ink)] px-3 py-1.5 text-[10px] font-black uppercase text-[var(--c-ink)]">{t("Saved Accounts", "حسابات محفوظة")}</div>
+                                  {suggestions.map((acc, i) => (
+                                    <button key={i} type="button" onMouseDown={(e) => { e.preventDefault(); setFormData((prev) => ({ ...prev, [field.key]: acc.accountId })); setIsSuggestionsOpen(false); }} className="w-full text-left p-3 text-sm font-black uppercase hover:bg-[var(--c-orange)] hover:text-white border-b-2 border-[var(--c-ink)]/10 last:border-0">{acc.accountId}</button>
+                                  ))}
+                                </div>
                               )}
                             </div>
-                            <input type="text" value={formData[field.key] || ""} onChange={(e) => setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))} onFocus={() => { if(idx === 0) setIsSuggestionsOpen(true); }} onBlur={() => { setTimeout(() => setIsSuggestionsOpen(false), 200); }} placeholder={field.placeholder} className="w-full border-4 border-[var(--c-ink)] px-4 py-3 text-lg font-bold bg-transparent outline-none focus:border-[var(--c-orange)]" />
-                            {idx === 0 && isSuggestionsOpen && suggestions.length > 0 && (
-                              <div className="absolute top-full left-0 right-0 z-20 border-4 border-[var(--c-ink)] bg-[var(--c-bg)] shadow-[4px_4px_0px_var(--c-ink)] mt-1">
-                                <div className="bg-[var(--c-lime)] border-b-4 border-[var(--c-ink)] px-3 py-1.5 text-[10px] font-black uppercase text-[var(--c-ink)]">{t("Saved Accounts", "حسابات محفوظة")}</div>
-                                {suggestions.map((acc, i) => (
-                                  <button key={i} type="button" onMouseDown={(e) => { e.preventDefault(); setFormData((prev) => ({ ...prev, [field.key]: acc.accountId })); setIsSuggestionsOpen(false); }} className="w-full text-left p-3 text-sm font-black uppercase hover:bg-[var(--c-orange)] hover:text-white border-b-2 border-[var(--c-ink)]/10 last:border-0">{acc.accountId}</button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )})}
-                        <div>
-                          <label className="block text-sm font-black uppercase mb-2">{t("Name (Optional)", "الاسم (اختياري)")}</label>
-                          <input type="text" value={playerName} onChange={(e) => setPlayerName(e.target.value)} placeholder={t("Enter your name", "أدخل اسمك")} className="w-full border-4 border-[var(--c-ink)] px-4 py-3 text-lg font-bold bg-transparent outline-none focus:border-[var(--c-orange)]" />
+                          )})}
+                        </div>
+                        
+                        <div className="bg-black/5 p-4 border-2 border-black border-dashed">
+                          <label className="block text-[10px] font-black uppercase mb-1 opacity-60">{t("Player Name (Optional)", "اسم اللاعب (اختياري - لتأكيد الحساب)")}</label>
+                          <input type="text" value={playerName} onChange={(e) => setPlayerName(e.target.value)} placeholder={t("e.g. AL LORD", "مثال: اللورد")} className="w-full bg-transparent border-b-2 border-black p-2 font-black text-sm outline-none" />
                         </div>
 
                         {/* Promo Code Section */}
@@ -627,155 +628,51 @@ export default function GameDetailPage() {
                                {t("Please fill all required fields and agree to terms", "يرجى ملء كافة الحقول الإجبارية والموافقة على الشروط")}
                             </p>
                           )}
-                          {paymentMethod === "gems" ? (() => {
+                          {(() => {
                              const baseUnitPrice = selectedPkg.discountedPrice !== undefined ? selectedPkg.discountedPrice : (typeof selectedPkg.price === 'number' ? selectedPkg.price : (parseInt(selectedPkg.price.replace(/\D/g, ""), 10) || 0));
                              const totalBasePrice = baseUnitPrice * quantity;
                              // 50 Gems = 45 EGP logic
                              const gemsPrice = Math.ceil(totalBasePrice / 0.9);
                              const hasEnough = balance >= gemsPrice;
+                             const missingGems = gemsPrice > balance ? gemsPrice - balance : 0;
                              return (
-                               <div className="space-y-2">
+                               <div className="space-y-3">
                                  <button 
                                    onClick={submitGemOrder} 
-                                   disabled={!isFormValid || !hasEnough} 
-                                   className={`w-full bg-[#101010] text-white px-6 py-5 text-xl font-black uppercase flex items-center justify-center gap-2 transition-all shadow-[6px_6px_0px_#b084ff] hover:translate-x-1 hover:translate-y-1 hover:shadow-none ${(!isFormValid || !hasEnough) ? "opacity-30 cursor-not-allowed grayscale" : "hover:bg-[#b084ff]"}`}
+                                   disabled={!isFormValid || !hasEnough || isVerifying} 
+                                   className={`w-full bg-[#101010] text-white px-6 py-5 text-xl font-black uppercase flex items-center justify-center gap-2 transition-all shadow-[6px_6px_0px_#b084ff] hover:translate-x-1 hover:translate-y-1 hover:shadow-none ${(!isFormValid || !hasEnough || isVerifying) ? "opacity-30 cursor-not-allowed grayscale" : "hover:bg-[#b084ff]"}`}
                                  >
-                                   <GemIcon size={24} /> {t("Pay Instantly", "ادفع فوراً")} ({formatGems(gemsPrice)})
+                                   {isVerifying ? <Loader2 className="w-6 h-6 animate-spin" /> : <GemIcon size={24} />} 
+                                   {isVerifying ? t("Processing...", "جاري الدفع...") : t("Pay with Gems", "ادفع بالجواهر")} ({formatGems(gemsPrice)})
                                  </button>
                                  {!hasEnough && isFormValid && (
-                                   <p className="text-[10px] font-black uppercase text-red-600 text-center animate-pulse">
-                                     {t("Insufficient Gem Balance", "رصيد الجواهر غير كافٍ")}
-                                   </p>
+                                   <div className="flex flex-col items-center gap-3 mt-4 p-4 border-4 border-red-600 bg-red-50 relative overflow-hidden shadow-[4px_4px_0px_#dc2626]">
+                                     <div className="absolute -right-4 -bottom-4 opacity-10 pointer-events-none rotate-12">
+                                        <GemIcon size={80} />
+                                     </div>
+                                     <p className="text-sm font-black uppercase text-red-600 text-center relative z-10 flex items-center gap-2">
+                                       {t("Insufficient Gem Balance", "رصيد الجواهر في حسابك غير كافٍ")}
+                                     </p>
+                                     <p className="text-xs font-bold text-red-700 uppercase text-center relative z-10">
+                                       {t(`You are missing ${missingGems} gems to complete this purchase.`, `ينقصك ${missingGems} جوهرة لإتمام عملية الشراء.`)}
+                                     </p>
+                                     <Link 
+                                       to={`/buy-gems?amount=${missingGems}`} 
+                                       className="mt-2 w-full bg-red-600 text-white text-center py-3 text-sm font-black uppercase shadow-[4px_4px_0px_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all relative z-10 border-2 border-black flex items-center justify-center gap-2"
+                                     >
+                                       {t(`Buy ${missingGems} Gems Now`, `اشحن ${missingGems} جوهرة الآن`)} <ArrowLeft className="w-4 h-4 rotate-180 hidden md:block" />
+                                     </Link>
+                                   </div>
                                  )}
                                </div>
                              );
-                          })() : (
-                            <button 
-                              onClick={() => setCheckoutStep(2)} 
-                              disabled={!isFormValid} 
-                              className={`w-full bg-[var(--c-ink)] text-[var(--c-bg)] px-6 py-5 text-xl font-black uppercase flex items-center justify-center gap-2 transition-all shadow-[6px_6px_0px_var(--c-orange)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none mb-8 ${!isFormValid ? "opacity-30 cursor-not-allowed grayscale" : "hover:opacity-90"}`}
-                            >
-                              {t("Next: Payment Details", "التالي: بيانات الدفع")} <ArrowLeft className="w-6 h-6 rotate-180" />
-                            </button>
-                          )}
+                          })()}
                         </div>
                       )}
                     </div>
                   )}
 
-                  {checkoutStep === 2 && (
-                    <div className="animate-in fade-in slide-in-from-right duration-300">
-                      <div className="mb-8 p-6 border-4 border-black bg-white shadow-[8px_8px_0px_#000]">
-                         <h4 className="text-lg font-black uppercase mb-4 text-[var(--c-purple)]">{t("Send Transfer To:", "أرسل التحويل إلى:")}</h4>
-                         
-                         <div className="space-y-4 mb-6">
-                            {paymentMethod === "other" ? (
-                               <div className="p-4 border-4 border-black bg-[var(--c-lime)]">
-                                  <div className="flex justify-between items-center mb-1">
-                                     <span className="text-[10px] font-black uppercase opacity-60 tracking-tighter">{otherMethod} ({otherCountry})</span>
-                                     <CheckCircle className="w-4 h-4" />
-                                  </div>
-                                  <p className="text-xs font-bold opacity-70">
-                                     {t("Please contact support to complete payment for this method.", "يرجى التواصل مع الدعم لإتمام الدفع لهذه الوسيلة.")}
-                                  </p>
-                               </div>
-                            ) : (
-                               settings.paymentAccounts
-                                .filter(acc => acc.id === paymentMethod)
-                                .map((acc) => (
-                               <div key={acc.id} className="p-4 border-4 border-black bg-[var(--c-lime)] shadow-[4px_4px_0px_#000]">
-                                  <div className="flex justify-between items-center mb-1">
-                                     <span className="text-[10px] font-black uppercase opacity-60 tracking-tighter">{acc.name}</span>
-                                     <CheckCircle className="w-4 h-4" />
-                                  </div>
-                                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-                                     <span className="text-lg sm:text-xl font-black tracking-widest break-all text-center sm:text-left">{acc.value}</span>
-                                     <button 
-                                      onClick={(e) => { e.stopPropagation(); copyPaymentInfo(acc.value, acc.id); }}
-                                      className={`w-full sm:w-auto px-4 py-2 text-[10px] font-black uppercase border-2 border-black transition-all ${copiedId === acc.id ? "bg-[var(--c-orange)] text-black translate-x-0.5 translate-y-0.5 shadow-none" : "bg-black text-white hover:bg-white hover:text-black shadow-[2px_2px_0px_#000]"}`}
-                                     >
-                                       {copiedId === acc.id ? t("Copied!", "تم النسخ") : t("Copy", "نسخ")}
-                                     </button>
-                                  </div>
-                               </div>
-                               ))
-                            )}
-                         </div>
-
-                         <div className="pt-4 border-t-4 border-black/10">
-                            <label className="block text-sm font-black uppercase mb-2 text-[var(--c-purple)]">{t("Your Number/Account (Sender):", "الرقم أو الحساب المحول منه:")} *</label>
-                            <input 
-                              type="text" 
-                              value={senderValue} 
-                              onChange={(e) => setSenderValue(e.target.value)}
-                              placeholder={t("Enter the number you sent from", "أدخل الرقم الذي قمت بالتحويل منه")}
-                              className="w-full border-4 border-black p-3 font-bold text-sm bg-white"
-                            />
-                            <p className="text-[9px] font-bold opacity-60 mt-1 uppercase">{t("Required to match your payment", "ضروري لمطابقة عملية الدفع الخاصة بك")}</p>
-                         </div>
-                      </div>
-
-                      <div className="flex gap-4 mb-8">
-                         <button onClick={() => setCheckoutStep(1)} className="flex-1 border-4 border-black p-4 font-black uppercase text-sm hover:bg-black/5">{t("Back", "رجوع")}</button>
-                         <button 
-                          onClick={() => setCheckoutStep(3)} 
-                          disabled={!senderValue.trim()} 
-                          className={`flex-1 bg-[var(--c-lime)] border-4 border-black p-4 font-black uppercase text-sm shadow-[4px_4px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all ${!senderValue.trim() && 'opacity-30 grayscale'}`}
-                         >
-                           {t("Next: Upload Proof", "التالي: رفع الإثبات")}
-                         </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {checkoutStep === 3 && (
-                    <div className="animate-in fade-in slide-in-from-right duration-300">
-                      <div className="mb-8 p-6 border-4 border-black bg-white shadow-[8px_8px_0px_#000]">
-                         <h4 className="text-lg font-black uppercase mb-4 text-[var(--c-purple)]">{t("Transfer Proof", "إثبات التحويل")}</h4>
-                         
-                         <div className="relative group cursor-pointer border-4 border-dashed border-black/30 p-8 text-center bg-black/5 hover:bg-[var(--c-lime)]/5 transition-all mb-4 overflow-hidden">
-                            {transferProof ? (
-                              <div className="relative animate-in zoom-in duration-300">
-                                 <img src={transferProof} className="max-h-48 mx-auto border-2 border-black shadow-[4px_4px_0px_#000]" />
-                                 <button onClick={(e) => { e.stopPropagation(); setTransferProof(null); }} className="absolute -top-4 -right-4 bg-red-600 text-white w-8 h-8 rounded-full border-4 border-black flex items-center justify-center hover:scale-110 transition-transform"> <X className="w-4 h-4" /> </button>
-                              </div>
-                            ) : (
-                              <>
-                                <ImagePlus className="w-12 h-12 mx-auto mb-4 opacity-40 group-hover:scale-110 transition-transform" />
-                                <p className="text-xs font-black uppercase opacity-60 leading-tight">{t("Tap to upload transfer screenshot", "اضغط لرفع صورة إثبات التحويل")}</p>
-                              </>
-                            )}
-                            <input type="file" accept="image/*" onChange={handleProofUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
-                         </div>
-                      </div>
-
-                      {isVerifying ? (
-                        <div className="flex flex-col items-center justify-center p-8 border-4 border-black bg-white mb-8 animate-pulse text-center">
-                           <Loader2 className="w-12 h-12 animate-spin mb-4" />
-                           <h4 className="text-lg font-black uppercase tracking-tighter">{t("Verifying Data...", "جاري التحقق من البيانات...")}</h4>
-                           <p className="text-[10px] font-bold opacity-60 mt-2 uppercase">{t("Please don't close the window", "يرجى عدم إغلاق النافذة")}</p>
-                        </div>
-                      ) : (
-                        <div>
-                          {!transferProof && (
-                             <p className="text-[10px] font-black uppercase text-red-600 mb-2 text-center animate-pulse">
-                               {t("Please upload a transfer screenshot to continue", "يرجى رفع صورة إثبات التحويل للمتابعة")}
-                             </p>
-                          )}
-                          <div className="flex gap-4 mb-8">
-                            <button onClick={() => setCheckoutStep(2)} className="flex-1 border-4 border-black p-4 font-black uppercase text-sm hover:bg-black/5">{t("Back", "رجوع")}</button>
-                            <button 
-                              onClick={submitOrder} 
-                              disabled={!transferProof} 
-                              className={`flex-1 bg-[var(--c-ink)] text-white border-4 border-black p-4 font-black uppercase text-sm shadow-[4px_4px_0px_var(--c-orange)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all ${!transferProof && 'opacity-30 grayscale'}`}
-                            >
-                              {t("Complete Order", "إتمام الطلب")}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {/* Step 2 and 3 removed (Payment transfer details & proof upload) */}
 
                   {checkoutStep === 4 && (
                     <div className="animate-in fade-in zoom-in duration-500 text-center py-8">

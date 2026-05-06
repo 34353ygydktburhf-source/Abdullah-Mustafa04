@@ -14,6 +14,7 @@ import {
   RawStats,
   HomeCommunityTeaser,
   Footer,
+  OnboardingTutorial,
 } from "@/components/ControlledChaos";
 
 export default function ControlledChaosPage() {
@@ -43,6 +44,7 @@ export default function ControlledChaosPage() {
 
   return (
     <>
+      <OnboardingTutorial />
       <GlobalStyles />
       <Navbar />
       <Hero />

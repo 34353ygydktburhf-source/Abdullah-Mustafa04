@@ -79,7 +79,7 @@ interface CommunityContextType {
 
 const CommunityContext = createContext<CommunityContextType | undefined>(undefined);
 
-const DEV_PIN = "882200";
+const DEV_PIN = import.meta.env.VITE_ADMIN_PIN || "";
 
 const RESTRICTED_REGEX = /((http|https):\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|\b(?:\+?\d{1,3}[-. ]?)?\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4,8}\b|\d{7,})/i;
 

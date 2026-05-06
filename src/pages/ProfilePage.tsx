@@ -1,4 +1,4 @@
-import { User, ShieldCheck, Trophy, History, Star, CreditCard, LogIn, LogOut, CheckCircle, Info, X, Plus, ChevronDown, ChevronUp, ReceiptText, Copy, Check, BellRing, AlertTriangle, ChevronRight, Code, Video, Gift, Link as LinkIcon } from "lucide-react";
+import { User, ShieldCheck, Trophy, History, Star, CreditCard, LogIn, LogOut, CheckCircle, Info, X, Plus, ChevronDown, ChevronUp, ReceiptText, Copy, Check, BellRing, AlertTriangle, ChevronRight, Code, Video, Gift, Link as LinkIcon, RefreshCw, Terminal } from "lucide-react";
 import { useLogin } from "@/components/ControlledChaos/LoginContext";
 import { useWallet } from "@/components/ControlledChaos/WalletContext";
 import { GemIcon } from "@/components/ControlledChaos/GemIcon";
@@ -10,7 +10,7 @@ import { SavedAccountsModal } from "@/components/ControlledChaos/AccountSystem";
 import { GlobalStyles } from "@/components/ControlledChaos/GlobalStyles";
 import { ComplaintModal } from "@/components/ControlledChaos/ComplaintModal";
 import { useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAdminStatus } from "@/components/ControlledChaos/AdminStatusContext";
 import { StatusRing } from "@/components/ControlledChaos/StatusRing";
 import { StoryViewer } from "@/components/ControlledChaos/StoryViewer";
@@ -40,6 +40,17 @@ export default function ProfilePage() {
   const [showComplaintModal, setShowComplaintModal] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) {
+      addNotification(
+        t("System Warning", "تحذير النظام"),
+        t("Cinematic Journey (Tutorial) is optimized for high-performance desktop systems. Mobile stability is not guaranteed.", "الرحلة السينمائية (التعليمية) مصممة للعمل على أجهزة الكمبيوتر عالية الأداء. استقرار النظام على الجوال غير مضمون."),
+        "warning"
+      );
+    }
+  }, []);
 
   const handleCopy = (text: string, fieldId: string) => {
     navigator.clipboard.writeText(text);
@@ -127,13 +138,47 @@ export default function ProfilePage() {
         <LogOut className="w-4 h-4" />
         {t("Logout", "تسجيل الخروج")}
       </button>
-      <Link 
-        to="/admin"
-        className="flex items-center gap-2 bg-[#101010] text-[#ccff00] px-3 py-2 text-[10px] md:text-xs font-black uppercase hover:bg-black hover:text-[#fffbf0] transition-all border-2 border-[#ccff00] shadow-[4px_4px_0px_#ccff00] active:translate-y-0.5 active:shadow-none w-full md:w-auto justify-center md:justify-start md:ml-auto"
-      >
-        <Code className="w-4 h-4" />
-        {t("Dev Access", "دخول المطورين")}
-      </Link>
+
+      <div className="pt-2 border-t-2 border-black/10 mt-2">
+         <div className="flex flex-col gap-3 p-2">
+            <span className="text-[8px] font-black text-black/30 uppercase tracking-[0.2em] mb-1">{t("SYSTEM_UTILITIES", "أدوات النظام")}</span>
+            
+            <div className="flex flex-col gap-4">
+               {/* Developer Access - Minimalist */}
+               <Link 
+                  to="/admin"
+                  onClick={() => setIsActionsModalOpen(false)}
+                  className="flex items-center gap-3 text-black/60 hover:text-black transition-all group"
+               >
+                  <div className="p-1.5 bg-black/5 group-hover:bg-[#ccff00] transition-colors border border-black/10 group-hover:border-black">
+                     <Code className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex flex-col leading-none">
+                     <span className="text-[10px] font-black uppercase tracking-tight">{t("DEV_CONSOLE", "وحدة التحكم")}</span>
+                     <span className="text-[7px] font-bold opacity-40 mt-0.5">AUTH_LEVEL_01</span>
+                  </div>
+               </Link>
+
+               {/* Re-initialize Protocol - Minimalist */}
+               <button 
+                  onClick={() => { 
+                     localStorage.removeItem("al-lord-onboarding-completed");
+                     window.dispatchEvent(new CustomEvent('al-lord-start-onboarding'));
+                     setIsActionsModalOpen(false);
+                  }}
+                  className="flex items-center gap-3 text-black/60 hover:text-black transition-all group"
+               >
+                  <div className="p-1.5 bg-black/5 group-hover:bg-red-500 group-hover:text-white transition-colors border border-black/10 group-hover:border-black">
+                     <RefreshCw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-700" />
+                  </div>
+                  <div className="flex flex-col leading-none text-left">
+                     <span className="text-[10px] font-black uppercase tracking-tight">{t("RESET_INTERFACE", "إعادة ضبط الواجهة")}</span>
+                     <span className="text-[7px] font-bold opacity-40 mt-0.5">RE_INIT_CMD_v4.0</span>
+                  </div>
+               </button>
+            </div>
+         </div>
+      </div>
     </>
   );
 
@@ -142,6 +187,7 @@ export default function ProfilePage() {
       <GlobalStyles />
     <div className="min-h-screen flex flex-col font-sans selection:bg-[#b084ff] selection:text-[#fffbf0]" dir={lang === "ar" ? "rtl" : "ltr"}>
       <Navbar />
+
 
       {/* Floating Close Button */}
       <button 
@@ -157,7 +203,7 @@ export default function ProfilePage() {
         <div className="max-w-4xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-500">
           
           {/* Profile Header Block */}
-          <div className="bg-[#b084ff] text-[#101010] border-4 border-black p-6 md:p-10 shadow-[8px_8px_0px_#000] relative overflow-hidden">
+          <div className="bg-[#b084ff] text-[#101010] border-4 border-black p-6 md:p-10 shadow-[8px_8px_0px_#000] relative overflow-hidden group">
             {/* Shadow Overlay decoration */}
             <div className="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 opactiy-10 -mr-16 -mt-16 bg-[#ccff00] rounded-full blur-3xl opacity-20 pointer-events-none" />
             
@@ -230,23 +276,18 @@ export default function ProfilePage() {
                 
                 {isLoggedIn && (
                   <div className="mt-6">
-                    {/* Mobile Collapsible Button */}
-                    <div className="md:hidden">
+                    {/* Unified Actions Button */}
+                    <div className="flex flex-wrap gap-2">
                       <button 
                         onClick={() => setIsActionsModalOpen(true)}
-                        className="w-full flex items-center justify-between bg-[#101010] text-[#ccff00] px-4 py-3 font-black uppercase text-sm border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-0.5 active:shadow-none transition-all"
+                        className="w-full md:w-auto flex items-center justify-between md:justify-start gap-4 bg-[#101010] text-[#ccff00] px-6 py-3 font-black uppercase text-sm border-4 border-black shadow-[4px_4px_0px_#000] hover:shadow-[6px_6px_0px_#ccff00] hover:-translate-y-0.5 transition-all active:translate-y-0.5 active:shadow-none"
                       >
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center gap-3">
                           <ReceiptText className="w-5 h-5" />
                           {t("Account Actions", "إجراءات الحساب")}
                         </span>
-                        <ChevronRight className={`w-5 h-5 ${lang === 'ar' ? 'rotate-180' : ''}`} />
+                        <ChevronRight className={`w-5 h-5 ${lang === 'ar' ? 'rotate-180' : ''} md:ml-4`} />
                       </button>
-                    </div>
-
-                    {/* Desktop Side-by-Side */}
-                    <div className="hidden md:flex flex-wrap gap-2">
-                      <ActionButtons />
                     </div>
                   </div>
                 )}
@@ -275,7 +316,7 @@ export default function ProfilePage() {
         {/* Abstract pattern lines in background */}
         <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(#ccff00_1px,transparent_1px),linear-gradient(90deg,#ccff00_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
 
-        <div className="max-w-4xl mx-auto w-full pt-12 animate-in fade-in duration-500 relative z-10">
+        <div className="max-w-4xl mx-auto w-full pt-20 md:pt-28 animate-in fade-in duration-500 relative z-10">
           {!isLoggedIn ? (
             <div className="text-center border-4 border-black p-8 bg-[#ccff00] shadow-[8px_8px_0px_#000] text-black">
               <LogIn className="w-20 h-20 mx-auto mb-6 opacity-30" />
@@ -321,7 +362,7 @@ export default function ProfilePage() {
                   onClick={() => setIsWalletExpanded(!isWalletExpanded)}
                 >
                   <div className="flex items-center gap-4">
-                    <h3 className="font-black uppercase text-2xl md:text-3xl flex items-center gap-3 text-[#b084ff]">
+                    <h3 className="font-black uppercase text-2xl md:text-3xl flex items-center gap-3 text-[#b084ff] mt-4 md:mt-6">
                       <GemIcon size={32} />
                       {t("Gem Wallet", "المحفظة الذهبية")}
                     </h3>
@@ -427,7 +468,7 @@ export default function ProfilePage() {
                 <div className="absolute top-0 right-0 p-4 opacity-10 blur-sm pointer-events-none">
                   <ShieldCheck className="w-32 h-32 text-[#ccff00]" />
                 </div>
-                <div className="flex justify-between items-end mb-6 relative z-10">
+                 <div className="flex justify-between items-end mb-6 relative z-10 mt-12 md:mt-16 scroll-mt-24 md:scroll-mt-32">
                   <div>
                     <h4 className="font-black uppercase text-2xl md:text-4xl text-[#ccff00] leading-none">{t("Status Upgrade", "تطوير رتبة الحساب")}</h4>
                     <p className="text-xs font-bold opacity-60 uppercase mt-2 text-[#fffbf0]">160 XP {t("to Next Level", "للمستوى التالي")}</p>
@@ -462,8 +503,8 @@ export default function ProfilePage() {
               </div>
 
               {/* Transaction Log */}
-              <div className="mt-12">
-                <div className="flex items-center gap-3 mb-8 border-b-4 border-[#fffbf0] pb-4">
+              <div className="mt-16 md:mt-24">
+                <div className="flex items-center gap-3 mb-8 border-b-4 border-[#fffbf0] pb-4 scroll-mt-24 md:scroll-mt-32">
                   <History className="w-8 h-8 text-[#ff5e00]" />
                   <h4 className="font-black uppercase text-3xl md:text-5xl tracking-tighter text-[#fffbf0]">{t("Transaction Log", "سجل العمليات")}</h4>
                 </div>
@@ -604,30 +645,49 @@ export default function ProfilePage() {
         onClose={() => setShowComplaintModal(false)} 
       />
 
+      {/* Account Actions Drawer */}
       {isActionsModalOpen && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-           <div className="absolute inset-0" onClick={() => setIsActionsModalOpen(false)} />
-           <div className="relative bg-[#fffbf0] border-8 border-black p-6 shadow-[15px_15px_0px_#ccff00] w-full max-w-sm">
-              <button 
-                onClick={() => setIsActionsModalOpen(false)}
-                className="absolute -top-6 -right-6 w-12 h-12 bg-white border-4 border-black flex items-center justify-center shadow-[4px_4px_0px_#000] hover:bg-black hover:text-white transition-all z-20"
-              >
-                <X className="w-6 h-6" />
-              </button>
-              
-              <div className="mb-6 flex items-center gap-3">
-                 <div className="bg-[#b084ff] p-2 border-2 border-black rotate-3">
-                    <ReceiptText className="w-6 h-6 text-black" />
+        <div className="fixed inset-0 z-[200] flex justify-end">
+           {/* Backdrop */}
+           <div 
+             className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300" 
+             onClick={() => setIsActionsModalOpen(false)} 
+           />
+           
+           {/* Drawer Content */}
+           <div className={`relative w-full max-w-[320px] md:max-w-[400px] h-full bg-[#fffbf0] border-l-8 border-black shadow-[-10px_0_30px_rgba(0,0,0,0.2)] ${lang === 'ar' ? 'drawer-animate-rtl font-sans' : 'drawer-animate'} flex flex-col`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+              {/* Header */}
+              <div className="p-6 md:p-8 border-b-4 border-black bg-[#b084ff] flex justify-between items-center relative overflow-hidden">
+                 <div className="absolute inset-0 opacity-10 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_50%,#000_50%,#000_75%,transparent_75%,transparent_100%)] bg-[size:20px_20px]"></div>
+                 <div className="flex items-center gap-4 relative z-10">
+                    <div className="bg-white p-2 border-2 border-black rotate-3 shadow-[3px_3px_0px_#000]">
+                       <ReceiptText className="w-6 h-6 text-black" />
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-black uppercase text-black leading-tight">{t("Quick Actions", "إجراءات سريعة")}</h3>
                  </div>
-                 <h3 className="text-2xl font-black uppercase text-black">{t("Account Actions", "إجراءات الحساب")}</h3>
+                 <button 
+                   onClick={() => setIsActionsModalOpen(false)}
+                   className="relative z-10 w-10 h-10 bg-white border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-all shadow-[3px_3px_0px_#000]"
+                 >
+                   <X className="w-6 h-6" />
+                 </button>
               </div>
               
-              <div className="flex flex-col gap-4">
-                 <ActionButtons />
+              {/* Actions List */}
+              <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4">
+                 <p className="text-[10px] font-black uppercase opacity-40 mb-2 tracking-widest">{t("Management & Tools", "الإدارة والأدوات")}</p>
+                 <div className="flex flex-col gap-3">
+                    <ActionButtons />
+                 </div>
               </div>
               
-              <div className="mt-8 pt-6 border-t-4 border-black/10">
-                 <p className="text-[10px] font-black uppercase opacity-40 text-center">{t("AL LORD STORE SYSTEM ACCESS", "ال لورد ستور - نظام الوصول")}</p>
+              {/* Footer */}
+              <div className="p-6 border-t-4 border-black bg-black text-white">
+                 <div className="flex items-center gap-3 mb-2">
+                   <ShieldCheck className="w-5 h-5 text-[#ccff00]" />
+                   <span className="text-[10px] font-black uppercase tracking-widest">{t("Secure Access", "وصول آمن")}</span>
+                 </div>
+                 <p className="text-[9px] font-bold opacity-50 uppercase">{t("AL LORD STORE SYSTEM ACCESS v2.0", "ال لورد ستور - نظام الوصول الإصدار 2.0")}</p>
               </div>
            </div>
         </div>

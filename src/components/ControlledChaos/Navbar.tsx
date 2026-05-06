@@ -10,8 +10,31 @@ import { NotificationCenter } from "./NotificationCenter";
 import { useWallet } from "./WalletContext";
 import { GemIcon } from "./GemIcon";
 import { formatGems } from "@/lib/utils";
+import { useSettings } from "./SettingsContext";
+import { useMonthlyStore } from "./MonthlyStoreContext";
+
+function MonthlyStoreBadge() {
+  const { status, isOpen, openStore } = useMonthlyStore();
+  const { t } = useLang();
+  
+  if (status === 'burned' || status === 'confirmed') return null;
+  
+  return (
+    <Link 
+      to="/monthly-store"
+      className="relative flex items-center gap-2 bg-black text-[var(--c-lime)] px-4 py-1.5 border-2 border-[var(--c-lime)] shadow-[4px_4px_0px_var(--c-lime)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group overflow-hidden pointer-events-auto"
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+      <span className="animate-pulse">🔥</span>
+      <span className="text-[10px] md:text-xs font-black uppercase tracking-tighter">
+        {t("Monthly Store", "المتجر الشهري")}
+      </span>
+    </Link>
+  );
+}
 
 export function Navbar() {
+  const { settings } = useSettings();
   const { lang, toggleLang, t } = useLang();
   const { openLogin, isLoggedIn, openLogoutConfirm } = useLogin();
   const { unreadCount } = useNotifications();
@@ -23,7 +46,12 @@ export function Navbar() {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-4 py-3 md:px-6 md:py-4 pointer-events-none ${isHomePage ? "mix-blend-difference" : ""}`}>
+      {settings.announcementBanner && (
+        <div className="bg-[var(--c-orange)] text-black font-black uppercase text-[10px] md:text-xs text-center py-1.5 px-4 shadow-[0_2px_0_#000] relative z-[101] pointer-events-auto flex items-center justify-center gap-2">
+           <span className="animate-pulse">🔥</span> {settings.announcementBanner} <span className="animate-pulse">🔥</span>
+        </div>
+      )}
+      <nav className={`fixed ${settings.announcementBanner ? 'top-7 md:top-8' : 'top-0'} left-0 right-0 z-[100] flex items-center justify-between px-4 py-3 md:px-6 md:py-4 pointer-events-none ${isHomePage ? "mix-blend-difference" : ""}`}>
         {isHomePage ? (
           <Link to="/" className="flex items-center gap-1.5 md:gap-2 shrink-0 hover:scale-105 transition-transform pointer-events-auto" dir="ltr">
             <Gamepad2 className="w-6 h-6 md:w-8 md:h-8 text-[var(--c-lime)]" />
@@ -35,6 +63,7 @@ export function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-8 text-sm uppercase tracking-widest text-white pointer-events-auto">
+          <MonthlyStoreBadge />
           {isHomePage && (
             <>
               <a href="#games" className="hover:line-through">{t("Games", "الألعاب")}</a>
@@ -161,7 +190,7 @@ export function Navbar() {
       
       {/* Profile Button - Standalone */}
       {isHomePage && (
-        <div className={`fixed top-2.5 md:top-4 ${lang === "ar" ? "left-3 md:left-6" : "right-3 md:right-6"} z-[110] pointer-events-auto`}>
+        <div className={`fixed ${settings.announcementBanner ? 'top-9 md:top-12' : 'top-2.5 md:top-4'} ${lang === "ar" ? "left-3 md:left-6" : "right-3 md:right-6"} z-[110] pointer-events-auto transition-all`}>
           <NavProfileButton />
         </div>
       )}

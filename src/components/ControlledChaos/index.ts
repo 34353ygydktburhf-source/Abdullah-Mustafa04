@@ -14,3 +14,4 @@ export { HomeCommunityTeaser } from "./HomeCommunityTeaser";
 export { CommunityAds } from "./CommunityAds";
 export { LangProvider } from "./LangContext";
 export { ArabGamingHub } from "./ArabGamingHub";
+export { OnboardingTutorial } from "./OnboardingTutorial";

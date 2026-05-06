@@ -20,6 +20,7 @@ export interface Order {
   status: OrderStatus;
   timestamp: string;
   screenshot?: string; // Base64 proof of transfer
+  adminNote?: string; // Message from admin about this status
 }
 
 interface OrderContextType {
@@ -103,7 +104,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
 
           addNotification(title, message, type);
         }
-        return { ...order, status };
+        return { ...order, status, adminNote: note || order.adminNote };
       }
       return order;
     }));

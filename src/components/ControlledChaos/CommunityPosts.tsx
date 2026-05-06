@@ -426,8 +426,8 @@ ${post.description}
           <div className="fixed inset-0 bg-black/60 backdrop-blur-[4px] z-[400]" onClick={() => setActiveReactionPicker(null)}></div>
           
           <div className="fixed bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 flex items-center justify-center z-[500] w-full px-4 pointer-events-none">
-            <div className="pointer-events-auto flex items-center gap-1 md:gap-3 bg-white border-4 border-black p-4 md:p-6 shadow-[0_16px_0_#000] animate-in zoom-in-95 slide-in-from-bottom-10 duration-300 w-full max-w-[380px] justify-around relative">
-              <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-1 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+            <div className="pointer-events-auto flex items-center gap-2 md:gap-4 bg-white border-4 border-black p-4 md:p-6 shadow-[0_16px_0_#000] animate-in zoom-in-95 slide-in-from-bottom-10 duration-300 w-full max-w-[320px] md:max-w-[520px] justify-center relative">
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-x-4 border-white shadow-[4px_4px_0px_#000]">
                 {t("What's your reaction?", "ما هو تفاعلك؟")}
               </div>
               {(Object.keys(reactionEmojis) as Array<keyof Reactions>).map((type) => (
@@ -439,7 +439,7 @@ ${post.description}
                     setActiveReactionPicker(null);
                     gsap.fromTo(e.currentTarget, { scale: 1.5, y: -20 }, { scale: 1, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
                   }}
-                  className="text-3xl md:text-4xl hover:-translate-y-3 hover:scale-125 transition-all duration-300 p-2 md:p-3 cursor-pointer bg-[#f8f8f8] border-2 border-transparent hover:border-black hover:shadow-[4px_4px_0px_#000] rounded-xl active:bg-[var(--c-lime)] flex items-center justify-center shrink-0 w-12 h-12 md:w-16 md:h-16"
+                  className="text-2xl md:text-4xl hover:-translate-y-3 hover:scale-125 transition-all duration-300 p-1 md:p-3 cursor-pointer bg-[#f8f8f8] border-2 border-transparent hover:border-black hover:shadow-[4px_4px_0px_#000] rounded-xl active:bg-[var(--c-lime)] flex items-center justify-center shrink-0 w-10 h-10 md:w-16 md:h-16"
                   title={type}
                 >
                   <span className="leading-none">{reactionEmojis[type]}</span>

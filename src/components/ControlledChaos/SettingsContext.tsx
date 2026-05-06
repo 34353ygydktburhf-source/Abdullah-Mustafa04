@@ -12,6 +12,10 @@ export interface SiteSettings {
   paymentAccounts: { id: string; name: string; value: string; countryCode?: string }[];
   notificationsEnabled: boolean;
   bannerImages: string[];
+  maintenanceMode: boolean;
+  announcementBanner: string;
+  siteName: string;
+  gemPrice: number;
 }
 
 const DEFAULT_SETTINGS: SiteSettings = {
@@ -34,7 +38,11 @@ const DEFAULT_SETTINGS: SiteSettings = {
     "https://i.pinimg.com/1200x/2c/68/d9/2c68d9f10928a6f3a388147d337d4062.jpg",
     "https://i.pinimg.com/1200x/41/6e/f4/416ef493cba6e992c2e32e0468d9d033.jpg",
     "https://i.pinimg.com/1200x/61/ea/f4/61eaf493cba6e992c2e32e0468d9d033.jpg"
-  ]
+  ],
+  maintenanceMode: false,
+  announcementBanner: "خصم 50% على جميع شحنات ببجي موبايل اليوم!",
+  siteName: "AL LORD STORE",
+  gemPrice: 0.9
 };
 
 interface SettingsContextType {
@@ -54,7 +62,14 @@ export const useSettings = () => {
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [settings, setSettings] = useState<SiteSettings>(() => {
     const stored = localStorage.getItem("al-lord-site-settings");
-    return stored ? JSON.parse(stored) : DEFAULT_SETTINGS;
+    if (!stored) return DEFAULT_SETTINGS;
+    try {
+      const parsed = JSON.parse(stored);
+      // Merge with defaults to ensure new keys exist
+      return { ...DEFAULT_SETTINGS, ...parsed };
+    } catch (e) {
+      return DEFAULT_SETTINGS;
+    }
   });
 
   const updateSettings = (updates: Partial<SiteSettings>) => {

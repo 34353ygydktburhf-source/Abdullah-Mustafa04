@@ -9,7 +9,14 @@ export interface GamePackage {
 }
 
 export interface GameFieldConfig {
-  fields: { key: string; label: string; placeholder: string; required: boolean }[];
+  fields: { 
+    key: string; 
+    label: string; 
+    placeholder: string; 
+    required: boolean;
+    type?: 'text' | 'select';
+    options?: { label: string; value: string }[];
+  }[];
   chargingInfo: string[];
   chargingMethod: string;
   deliveryTime: string;
@@ -18,6 +25,7 @@ export interface GameFieldConfig {
 export interface GameItem {
   id: string;
   name: string;
+  nameAr?: string;
   cat: string;
   tags: string[];
   color: string;
@@ -198,7 +206,19 @@ export const INITIAL_GAMES_DATA: GameItem[] = [
     fieldConfig: {
       fields: [
         { key: "playerId", label: "UID", placeholder: "أدخل UID من داخل اللعبة", required: true },
-        { key: "server", label: "السيرفر", placeholder: "مثال: Asia, Europe, America", required: true },
+        { 
+          key: "server", 
+          label: "السيرفر", 
+          placeholder: "اختر السيرفر", 
+          required: true,
+          type: 'select',
+          options: [
+            { label: "Asia", value: "Asia" },
+            { label: "Europe", value: "Europe" },
+            { label: "America", value: "America" },
+            { label: "TW, HK, MO", value: "TW_HK_MO" },
+          ]
+        },
       ],
       chargingInfo: ["يتم الشحن عبر UID مباشرة بدون كلمة سر", "تأكد من اختيار السيرفر الصحيح", "Welkin Moon يتم تفعيله فوراً"],
       chargingMethod: "Vodafone Cash / InstaPay",
@@ -255,7 +275,20 @@ export const INITIAL_GAMES_DATA: GameItem[] = [
     fieldConfig: {
       fields: [
         { key: "riotId", label: "Riot ID", placeholder: "مثال: Player#TAG", required: true },
-        { key: "server", label: "السيرفر", placeholder: "مثال: EU, NA, AP", required: true },
+        { 
+          key: "server", 
+          label: "السيرفر", 
+          placeholder: "اختر السيرفر", 
+          required: true,
+          type: 'select',
+          options: [
+            { label: "Europe (EU)", value: "EU" },
+            { label: "North America (NA)", value: "NA" },
+            { label: "Asia Pacific (AP)", value: "AP" },
+            { label: "Brazil (BR)", value: "BR" },
+            { label: "LATAM", value: "LATAM" },
+          ]
+        },
       ],
       chargingInfo: ["يتم الشحن عبر Riot ID", "تأكد من السيرفر الصحيح"],
       chargingMethod: "Vodafone Cash / InstaPay",
